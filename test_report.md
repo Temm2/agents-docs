@@ -1,6 +1,6 @@
 # RAMM Agent Test Report
 
-**Generated:** 2026-01-22 16:20:27 UTC
+**Generated:** 2026-01-22 18:38:59 UTC
 
 ## Test Summary
 
@@ -32,15 +32,17 @@
 
 ### ✅ purchase_flow
 
-**Score:** 24/24 (100.0%)
+**Score:** 27/27 (100.0%)
 
 **Checks:**
+- ✓ SHOPI → VALET campaign query
 - ✓ SHOPI recommends campaign
 - ✓ SHOPI → MARKT swap request
 - ✓ SHOPI → PAYME authorization
 - ✓ SHOPI → FOLIO mint request
 - ✓ FOLIO mints PVT
 - ✓ PAYME settles escrow
+- ✓ A2A call SHOPI → VALET
 - ✓ A2A call SHOPI → MARKT
 - ✓ A2A call SHOPI → PAYME
 - ✓ A2A call SHOPI → FOLIO
@@ -316,7 +318,6 @@
 - Edge RIDIM → FOLIO: intent is 'unspecified', must be specified
 - Edge MARKT → FOLIO: intent is 'unspecified', must be specified
 - Edge SHOPI → PROMO: intent is 'unspecified', must be specified
-- Edge SHOPI → VALET: intent is 'unspecified', must be specified
 - Edge SHOPI → MIRO: intent is 'unspecified', must be specified
 - Edge DASHC → VALET: intent is 'unspecified', must be specified
 - Edge DASHC → PAYME: intent is 'unspecified', must be specified

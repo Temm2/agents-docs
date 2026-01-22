@@ -169,34 +169,58 @@
         </div>
 
         <div class="nav">
-            <h2>📚 Documentation Files</h2>
+            <h2>📚 Core Documentation</h2>
             <ul>
-                <li><a href="#test-report">Test Report</a></li>
-                <li><a href="#test-guide">Test Guide</a></li>
-                <li><a href="#sharing-guide">Sharing Guide</a></li>
-                <li><a href="#shopi-valet">SHOPI-VALET Connection</a></li>
-                <li><a href="#all-files">All Markdown Files</a></li>
+                <li><a href="README.md">📖 README.md</a></li>
+                <li><a href="test_report.html">📊 Complete Test Results (HTML)</a></li>
+                <li><a href="IMPLEMENTATION_SUMMARY.md">🚀 Implementation Summary</a></li>
+                <li><a href="TEST_GUIDE.md">🧪 Test Guide</a></li>
+                <li><a href="TESTING.md">✅ Testing</a></li>
+                <li><a href="TEST_SCENARIOS.md">📋 Test Scenarios</a></li>
+                <li><a href="STATE_ANALYSIS.md">🔍 State Analysis</a></li>
+                <li><a href="TEST_TYPES.md">📚 Test Types</a></li>
+                <li><a href="SHOPI_VALET_CONNECTION.md">🔗 SHOPI-VALET Connection</a></li>
             </ul>
         </div>
 
         <div class="content">
-            <h2 id="test-report">📊 Test Report</h2>
-            <p>Comprehensive test results including logic tests, business logic tests, and validation results.</p>
+            <h2>📖 README.md</h2>
+            <p>Project overview, quickstart guide, tech stack, and key agent descriptions.</p>
+            <a href="README.md" style="color: #667eea; text-decoration: none; display: inline-block; margin-top: 10px; padding: 10px 20px; background: #3a3a3a; border-radius: 5px;">Read README →</a>
+
+            <h2>📊 Complete Test Results (HTML)</h2>
+            <p>Comprehensive test results including logic tests, business logic tests, validation results, and SHOPI-VALET connection details.</p>
             <a href="test_report.html" style="color: #667eea; text-decoration: none; display: inline-block; margin-top: 10px; padding: 10px 20px; background: #3a3a3a; border-radius: 5px;">View Test Report →</a>
 
-            <h2 id="test-guide">🧪 Test Guide</h2>
+            <h2>🚀 Implementation Summary</h2>
+            <p>Complete overview of what was implemented, including business logic, testing framework, and visualization tools.</p>
+            <a href="IMPLEMENTATION_SUMMARY.md" style="color: #667eea; text-decoration: none; display: inline-block; margin-top: 10px; padding: 10px 20px; background: #3a3a3a; border-radius: 5px;">Read Implementation Summary →</a>
+
+            <h2>🧪 Test Guide</h2>
             <p>Step-by-step explanation of how agent logic tests work, perfect for beginners.</p>
             <a href="TEST_GUIDE.md" style="color: #667eea; text-decoration: none; display: inline-block; margin-top: 10px; padding: 10px 20px; background: #3a3a3a; border-radius: 5px;">Read Test Guide →</a>
 
-            <h2 id="sharing-guide">📤 Sharing Guide</h2>
-            <p>Complete guide on how to share test reports and documentation with others.</p>
-            <a href="SHARING_GUIDE.md" style="color: #667eea; text-decoration: none; display: inline-block; margin-top: 10px; padding: 10px 20px; background: #3a3a3a; border-radius: 5px;">Read Sharing Guide →</a>
+            <h2>✅ Testing</h2>
+            <p>Test pass criteria, scoring system, and validation checks.</p>
+            <a href="TESTING.md" style="color: #667eea; text-decoration: none; display: inline-block; margin-top: 10px; padding: 10px 20px; background: #3a3a3a; border-radius: 5px;">Read Testing Docs →</a>
 
-            <h2 id="shopi-valet">🔗 SHOPI-VALET Connection</h2>
-            <p>Explanation of how SHOPI queries VALET to get active campaigns.</p>
+            <h2>📋 Test Scenarios</h2>
+            <p>All 16 test scenarios documented (Happy Path, Security, Resilience).</p>
+            <a href="TEST_SCENARIOS.md" style="color: #667eea; text-decoration: none; display: inline-block; margin-top: 10px; padding: 10px 20px; background: #3a3a3a; border-radius: 5px;">Read Test Scenarios →</a>
+
+            <h2>🔍 State Analysis</h2>
+            <p>Analysis of state-changing vs non-state-changing activities and exposure/attack factors.</p>
+            <a href="STATE_ANALYSIS.md" style="color: #667eea; text-decoration: none; display: inline-block; margin-top: 10px; padding: 10px 20px; background: #3a3a3a; border-radius: 5px;">Read State Analysis →</a>
+
+            <h2>📚 Test Types</h2>
+            <p>Explanation of logic tests vs other test categories (integration, performance, etc.).</p>
+            <a href="TEST_TYPES.md" style="color: #667eea; text-decoration: none; display: inline-block; margin-top: 10px; padding: 10px 20px; background: #3a3a3a; border-radius: 5px;">Read Test Types →</a>
+
+            <h2>🔗 SHOPI-VALET Connection</h2>
+            <p>Explanation of how SHOPI queries VALET to get active campaigns. This information is also included in the test report.</p>
             <a href="SHOPI_VALET_CONNECTION.md" style="color: #667eea; text-decoration: none; display: inline-block; margin-top: 10px; padding: 10px 20px; background: #3a3a3a; border-radius: 5px;">Read Connection Docs →</a>
 
-            <h2 id="all-files">📁 All Documentation Files</h2>
+            <h2 id="all-files">📁 Additional Documentation Files</h2>
             <div class="file-list" id="file-list">
                 <!-- Files will be listed here by JavaScript -->
             </div>
@@ -204,23 +228,16 @@
     </div>
 
     <script>
-        // List all markdown files
+        // List additional markdown files (core files are shown above)
         const mdFiles = [
-            { name: "test_report.html", desc: "📊 Complete test results (HTML)", type: "html" },
             { name: "test_report.md", desc: "📊 Complete test results (Markdown)", type: "md" },
-            { name: "TEST_GUIDE.md", desc: "🧪 Step-by-step guide for beginners", type: "md" },
             { name: "SHARING_GUIDE.md", desc: "📤 How to share reports and docs", type: "md" },
-            { name: "SHOPI_VALET_CONNECTION.md", desc: "🔗 SHOPI queries VALET for campaigns", type: "md" },
-            { name: "TESTING.md", desc: "🧪 Test pass criteria and scoring", type: "md" },
-            { name: "TEST_SCENARIOS.md", desc: "📋 All test scenarios documented", type: "md" },
-            { name: "STATE_ANALYSIS.md", desc: "🔍 State change and security analysis", type: "md" },
             { name: "ANALYSIS_SUMMARY.md", desc: "📊 Summary of state changes and attacks", type: "md" },
-            { name: "TEST_TYPES.md", desc: "📚 Logic tests vs other test types", type: "md" },
             { name: "ANSWERS.md", desc: "❓ Answers to common questions", type: "md" },
             { name: "COMPLETE_ANSWERS.md", desc: "✅ Complete answers to all questions", type: "md" },
-            { name: "IMPLEMENTATION_SUMMARY.md", desc: "🚀 What was implemented", type: "md" },
             { name: "PUBLIC_SHARING.md", desc: "🌐 Public sharing options", type: "md" },
-            { name: "README.md", desc: "📖 Project overview and setup", type: "md" }
+            { name: "QUICK_SHARE.md", desc: "⚡ Quick sharing instructions", type: "md" },
+            { name: "GET_SHAREABLE_LINK.md", desc: "🔗 How to get shareable link", type: "md" }
         ];
 
         const fileList = document.getElementById('file-list');

@@ -280,6 +280,30 @@ def generate_html_report(output_path: str = "test_report.html") -> str:
     </div>
 
     <div class="section">
+        <h2>🔗 SHOPI-VALET Connection</h2>
+        <div class="test-result pass">
+            <h3>Campaign Data Query</h3>
+            <p>SHOPI queries VALET to retrieve active campaigns before making recommendations to shoppers.</p>
+            <div class="checks">
+                <div class="check-item pass">✅ A2A Edge: SHOPI → VALET (query, campaign.list_active)</div>
+                <div class="check-item pass">✅ NANDA Compliant: Uses 'query' performative (read-only)</div>
+                <div class="check-item pass">✅ Intent: campaign.list_active with optional filters/pagination</div>
+                <div class="check-item pass">✅ Test Coverage: purchase_flow scenario includes SHOPI → VALET query</div>
+            </div>
+            <p style="margin-top: 15px;"><strong>Flow:</strong></p>
+            <ol style="margin-left: 20px; margin-top: 10px;">
+                <li>Shopper opens SHOPI (shopping assistant)</li>
+                <li>SHOPI queries VALET: <code>campaign.list_active</code></li>
+                <li>VALET responds with campaign list (IDs, products, pricing, availability)</li>
+                <li>SHOPI personalizes using AI to match shopper preferences</li>
+                <li>SHOPI displays recommended campaigns</li>
+                <li>Shopper selects campaign → SHOPI executes purchase via FOLIO/PAYME/MARKT</li>
+            </ol>
+            <p style="margin-top: 15px;">For detailed documentation, see <a href="SHOPI_VALET_CONNECTION.md" style="color: #667eea;">SHOPI_VALET_CONNECTION.md</a></p>
+        </div>
+    </div>
+
+    <div class="section">
         <h2>📝 Notes</h2>
         <p>This report was generated automatically from the RAMM agent test suite.</p>
         <p>For more information, visit the project repository or run tests locally.</p>
