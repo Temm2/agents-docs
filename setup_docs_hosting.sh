@@ -47,7 +47,7 @@ else
     <p>All documentation files are available below:</p>
     <ul>
         <li><a href="test_report.html">📊 Test Report</a></li>
-        <li><a href="NOVICE_GUIDE.md">🎓 Novice Guide</a></li>
+        <li><a href="TEST_GUIDE.md">🧪 Test Guide</a></li>
         <li><a href="SHARING_GUIDE.md">📤 Sharing Guide</a></li>
         <li><a href="SHOPI_VALET_CONNECTION.md">🔗 SHOPI-VALET Connection</a></li>
         <li><a href="TESTING.md">🧪 Testing Guide</a></li>

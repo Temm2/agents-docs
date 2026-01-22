@@ -1,4 +1,4 @@
-# Step-by-Step Guide: How Agent Logic Tests Work (For Beginners)
+# Test Guide: How Agent Logic Tests Work (Step-by-Step)
 
 ## 🎯 What Are We Testing?
 

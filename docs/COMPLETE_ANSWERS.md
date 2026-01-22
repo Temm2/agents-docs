@@ -85,7 +85,7 @@ python -m app.visualize
 
 ## 4. Step-by-Step Explanation (For Novices)
 
-### Created: `NOVICE_GUIDE.md`
+### Created: `TEST_GUIDE.md`
 
 **Complete guide covering:**
 
@@ -144,7 +144,7 @@ Result: ✅ PASS (2 points earned)
 1. **`app/icp_architecture.py`**: ICP canister assumptions
 2. **`app/visualize.py`**: Mermaid + Rich visualizations
 3. **`app/report_generator.py`**: Updated colors (dark theme + purple)
-4. **`NOVICE_GUIDE.md`**: Complete step-by-step explanation
+4. **`TEST_GUIDE.md`**: Complete step-by-step explanation
 
 ### How to Use
 
@@ -158,9 +158,9 @@ python -m app.icp_architecture
 python -m app.visualize
 ```
 
-**Read Novice Guide:**
+**Read Test Guide:**
 ```bash
-cat NOVICE_GUIDE.md
+cat TEST_GUIDE.md
 # Or open in your editor
 ```
 
@@ -177,6 +177,6 @@ python -m app.report_generator
 ✅ **ICP Assumptions**: Documented in `app/icp_architecture.py`
 ✅ **Visualizations**: Mermaid diagrams + Rich terminal output
 ✅ **Color Palette**: Matched screenshot (dark + purple)
-✅ **Novice Guide**: Complete step-by-step explanation
+✅ **Test Guide**: Complete step-by-step explanation
 
 All questions answered! 🎉

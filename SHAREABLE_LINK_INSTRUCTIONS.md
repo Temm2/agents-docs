@@ -73,7 +73,7 @@ Once live, your link provides access to:
 - **test_report.md** - Test results (Markdown)
 
 ### Documentation
-- **NOVICE_GUIDE.md** - Beginner's guide
+- **TEST_GUIDE.md** - Test guide
 - **SHARING_GUIDE.md** - How to share
 - **SHOPI_VALET_CONNECTION.md** - Agent connections
 - **TESTING.md** - Test criteria
@@ -90,7 +90,7 @@ Once live, your link provides access to:
 **All accessible via direct links:**
 ```
 https://YOUR_USERNAME.github.io/YOUR_REPO/test_report.html
-https://YOUR_USERNAME.github.io/YOUR_REPO/NOVICE_GUIDE.md
+https://YOUR_USERNAME.github.io/YOUR_REPO/TEST_GUIDE.md
 https://YOUR_USERNAME.github.io/YOUR_REPO/SHARING_GUIDE.md
 ... etc
 ```
