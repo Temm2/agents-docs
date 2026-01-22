@@ -1,0 +1,427 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAMM Agent Test Report</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #e0e0e0;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+        }
+        .section {
+            background: #2a2a2a;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #3a3a3a;
+        }
+        .section h2 {
+            margin-top: 0;
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .summary-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .summary-card h3 {
+            margin: 0;
+            font-size: 2em;
+        }
+        .summary-card p {
+            margin: 5px 0 0 0;
+            opacity: 0.9;
+        }
+        .test-result {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid;
+        }
+        .test-result.pass {
+            background: #3a3a3a;
+            border-color: #667eea;
+            color: #ffffff;
+        }
+        .test-result.partial {
+            background: #3a3a3a;
+            border-color: #764ba2;
+            color: #ffffff;
+        }
+        .test-result.fail {
+            background: #3a3a3a;
+            border-color: #e74c3c;
+            color: #ffffff;
+        }
+        .test-result h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.2em;
+            color: #ffffff;
+        }
+        .test-result .score {
+            font-weight: bold;
+            margin: 5px 0;
+            color: #ffffff;
+        }
+        .test-result .checks {
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        .check-item {
+            margin: 3px 0;
+        }
+        .check-item.pass::before {
+            content: "✓ ";
+            color: #2ecc71;
+            font-weight: bold;
+        }
+        .check-item.fail::before {
+            content: "✗ ";
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .check-item {
+            color: #ffffff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #667eea;
+            color: white;
+        }
+        tr:hover {
+            background: #3a3a3a;
+        }
+        td {
+            color: #e0e0e0;
+        }
+        .timestamp {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚀 RAMM Agent Test Report</h1>
+        <p>Comprehensive test results for RAMM agentic commerce system</p>
+        <p class="timestamp">Generated: 2026-01-22 16:20:27 UTC</p>
+    </div>
+
+    <div class="section">
+        <h2>📊 Test Summary</h2>
+        <div class="summary">
+            <div class="summary-card">
+                <h3>16</h3>
+                <p>Logic Test Scenarios</p>
+            </div>
+            <div class="summary-card">
+                <h3>11</h3>
+                <p>Business Logic Tests</p>
+            </div>
+            <div class="summary-card">
+                <h3>✓</h3>
+                <p>Graph Validation</p>
+            </div>
+            <div class="summary-card">
+                <h3>✗</h3>
+                <p>NANDA Compliance</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🧪 Logic Tests (Agent Behavior)</h2>
+
+        <div class="test-result pass">
+            <h3>[PASS] campaign_creation</h3>
+            <div class="score">Score: 14/14 (100.0%)</div>
+            <div class="checks">
+                <div class="check-item pass">✓ VALET receives campaign config</div><div class="check-item pass">✓ VALET transitions to ACTIVE</div><div class="check-item pass">✓ VALET → PROMO notification</div><div class="check-item pass">✓ VALET → DASHB state update</div><div class="check-item pass">✓ A2A call VALET → PROMO</div><div class="check-item pass">✓ A2A call VALET → DASHB</div><div class="check-item pass">✓ VALET → active</div><div class="check-item pass">✓ Event keyword 'campaign' found</div><div class="check-item pass">✓ Event keyword 'VALET' found</div><div class="check-item pass">✓ Event keyword 'PROMO' found</div>
+            </div>
+        </div>
+
+        <div class="test-result pass">
+            <h3>[PASS] purchase_flow</h3>
+            <div class="score">Score: 24/24 (100.0%)</div>
+            <div class="checks">
+                <div class="check-item pass">✓ SHOPI recommends campaign</div><div class="check-item pass">✓ SHOPI → MARKT swap request</div><div class="check-item pass">✓ SHOPI → PAYME authorization</div><div class="check-item pass">✓ SHOPI → FOLIO mint request</div><div class="check-item pass">✓ FOLIO mints PVT</div><div class="check-item pass">✓ PAYME settles escrow</div><div class="check-item pass">✓ A2A call SHOPI → MARKT</div><div class="check-item pass">✓ A2A call SHOPI → PAYME</div><div class="check-item pass">✓ A2A call SHOPI → FOLIO</div><div class="check-item pass">✓ FOLIO → active</div><div class="check-item pass">✓ PAYME → settling</div><div class="check-item pass">✓ Event keyword 'SHOPI' found</div><div class="check-item pass">✓ Event keyword 'MARKT' found</div><div class="check-item pass">✓ Event keyword 'PAYME' found</div><div class="check-item pass">✓ Event keyword 'FOLIO' found</div><div class="check-item pass">✓ Event keyword 'PVT' found</div>
+            </div>
+        </div>
+
+        <div class="test-result pass">
+            <h3>[PASS] redemption_flow</h3>
+            <div class="score">Score: 16/16 (100.0%)</div>
+            <div class="checks">
+                <div class="check-item pass">✓ FOLIO → RIDIM redemption request</div><div class="check-item pass">✓ RIDIM → VALET validation</div><div class="check-item pass">✓ RIDIM → PORTE DPP mint</div><div class="check-item pass">✓ PORTE mints DPP</div><div class="check-item pass">✓ A2A call FOLIO → RIDIM</div><div class="check-item pass">✓ A2A call RIDIM → VALET</div><div class="check-item pass">✓ A2A call RIDIM → PORTE</div><div class="check-item pass">✓ PORTE → completed</div><div class="check-item pass">✓ Event keyword 'RIDIM' found</div><div class="check-item pass">✓ Event keyword 'PORTE' found</div><div class="check-item pass">✓ Event keyword 'DPP' found</div>
+            </div>
+        </div>
+
+        <div class="test-result partial">
+            <h3>[PARTIAL] unauthorized_command</h3>
+            <div class="score">Score: 8/9 (88.9%)</div>
+            <div class="checks">
+                <div class="check-item pass">✓ Auth check performed</div><div class="check-item pass">✓ Unauthorized command rejected</div><div class="check-item pass">✓ Event keyword 'auth' found</div><div class="check-item pass">✓ Event keyword 'unauthorized' found</div><div class="check-item fail">✗ Event keyword 'rejected' found</div><div class="check-item fail">  → Not found in timeline</div>
+            </div>
+        </div>
+
+        <div class="test-result partial">
+            <h3>[PARTIAL] replay_attack</h3>
+            <div class="score">Score: 9/10 (90.0%)</div>
+            <div class="checks">
+                <div class="check-item pass">✓ Idempotency check performed</div><div class="check-item pass">✓ Replay attack rejected</div><div class="check-item pass">✓ A2A call SHOPI → FOLIO</div><div class="check-item pass">✓ Event keyword 'idempotency' found</div><div class="check-item pass">✓ Event keyword 'replay' found</div><div class="check-item fail">✗ Event keyword 'rejected' found</div><div class="check-item fail">  → Not found in timeline</div>
+            </div>
+        </div>
+
+        <div class="test-result partial">
+            <h3>[PARTIAL] race_condition_supply_limit</h3>
+            <div class="score">Score: 8/11 (72.7%)</div>
+            <div class="checks">
+                <div class="check-item pass">✓ Supply check performed</div><div class="check-item pass">✓ Race condition handled</div><div class="check-item fail">✗ A2A call SHOPI → MARKT</div><div class="check-item fail">  → Expected call not found in timeline</div><div class="check-item fail">✗ A2A call SHOPI → FOLIO</div><div class="check-item fail">  → Expected call not found in timeline</div><div class="check-item pass">✓ Event keyword 'concurrent' found</div><div class="check-item pass">✓ Event keyword 'supply' found</div><div class="check-item pass">✓ Event keyword 'limit' found</div><div class="check-item fail">✗ Event keyword 'rejected' found</div><div class="check-item fail">  → Not found in timeline</div>
+            </div>
+        </div>
+
+        <div class="test-result partial">
+            <h3>[PARTIAL] invalid_redemption_timing</h3>
+            <div class="score">Score: 10/12 (83.3%)</div>
+            <div class="checks">
+                <div class="check-item pass">✓ Timing validation performed</div><div class="check-item pass">✓ Invalid timing rejected</div><div class="check-item pass">✓ A2A call FOLIO → RIDIM</div><div class="check-item pass">✓ A2A call RIDIM → VALET</div><div class="check-item pass">✓ Event keyword 'redemption' found</div><div class="check-item pass">✓ Event keyword 'timing' found</div><div class="check-item fail">✗ Event keyword 'invalid' found</div><div class="check-item fail">  → Not found in timeline</div><div class="check-item fail">✗ Event keyword 'rejected' found</div><div class="check-item fail">  → Not found in timeline</div>
+            </div>
+        </div>
+
+        <div class="test-result partial">
+            <h3>[PARTIAL] boundary_zero_amount</h3>
+            <div class="score">Score: 8/10 (80.0%)</div>
+            <div class="checks">
+                <div class="check-item pass">✓ Amount validation performed</div><div class="check-item pass">✓ Zero amount rejected</div><div class="check-item pass">✓ A2A call SHOPI → PAYME</div><div class="check-item pass">✓ Event keyword 'amount' found</div><div class="check-item pass">✓ Event keyword 'zero' found</div><div class="check-item fail">✗ Event keyword 'invalid' found</div><div class="check-item fail">  → Not found in timeline</div><div class="check-item fail">✗ Event keyword 'rejected' found</div><div class="check-item fail">  → Not found in timeline</div>
+            </div>
+        </div>
+
+        <div class="test-result partial">
+            <h3>[PARTIAL] double_redemption</h3>
+            <div class="score">Score: 9/10 (90.0%)</div>
+            <div class="checks">
+                <div class="check-item pass">✓ Redemption state tracked</div><div class="check-item pass">✓ Double redemption rejected</div><div class="check-item pass">✓ A2A call FOLIO → RIDIM</div><div class="check-item pass">✓ Event keyword 'double' found</div><div class="check-item pass">✓ Event keyword 'redemption' found</div><div class="check-item fail">✗ Event keyword 'rejected' found</div><div class="check-item fail">  → Not found in timeline</div>
+            </div>
+        </div>
+
+        <div class="test-result partial">
+            <h3>[PARTIAL] exceed_supply_limit</h3>
+            <div class="score">Score: 7/10 (70.0%)</div>
+            <div class="checks">
+                <div class="check-item pass">✓ Supply limit check performed</div><div class="check-item pass">✓ Exceeded supply rejected</div><div class="check-item fail">✗ A2A call SHOPI → MARKT</div><div class="check-item fail">  → Expected call not found in timeline</div><div class="check-item pass">✓ A2A call SHOPI → FOLIO</div><div class="check-item pass">✓ Event keyword 'supply' found</div><div class="check-item fail">✗ Event keyword 'exceeded' found</div><div class="check-item fail">  → Not found in timeline</div><div class="check-item fail">✗ Event keyword 'rejected' found</div><div class="check-item fail">  → Not found in timeline</div>
+            </div>
+        </div>
+
+        <div class="test-result partial">
+            <h3>[PARTIAL] insufficient_balance</h3>
+            <div class="score">Score: 8/9 (88.9%)</div>
+            <div class="checks">
+                <div class="check-item pass">✓ Balance check performed</div><div class="check-item pass">✓ Insufficient balance rejected</div><div class="check-item pass">✓ A2A call SHOPI → PAYME</div><div class="check-item pass">✓ Event keyword 'insufficient' found</div><div class="check-item pass">✓ Event keyword 'balance' found</div><div class="check-item fail">✗ Event keyword 'rejected' found</div><div class="check-item fail">  → Not found in timeline</div>
+            </div>
+        </div>
+
+        <div class="test-result partial">
+            <h3>[PARTIAL] invalid_state_transition</h3>
+            <div class="score">Score: 8/10 (80.0%)</div>
+            <div class="checks">
+                <div class="check-item pass">✓ State machine validation performed</div><div class="check-item pass">✓ Invalid transition rejected</div><div class="check-item fail">✗ A2A call VALET → DASHB</div><div class="check-item fail">  → Expected call not found in timeline</div><div class="check-item pass">✓ Event keyword 'state' found</div><div class="check-item pass">✓ Event keyword 'transition' found</div><div class="check-item pass">✓ Event keyword 'invalid' found</div><div class="check-item fail">✗ Event keyword 'rejected' found</div><div class="check-item fail">  → Not found in timeline</div>
+            </div>
+        </div>
+
+        <div class="test-result partial">
+            <h3>[PARTIAL] cross_campaign_contamination</h3>
+            <div class="score">Score: 9/10 (90.0%)</div>
+            <div class="checks">
+                <div class="check-item pass">✓ Campaign ID validation performed</div><div class="check-item pass">✓ Campaign mismatch rejected</div><div class="check-item pass">✓ A2A call FOLIO → RIDIM</div><div class="check-item pass">✓ A2A call RIDIM → VALET</div><div class="check-item pass">✓ Event keyword 'campaign' found</div><div class="check-item pass">✓ Event keyword 'mismatch' found</div><div class="check-item fail">✗ Event keyword 'rejected' found</div><div class="check-item fail">  → Not found in timeline</div>
+            </div>
+        </div>
+
+        <div class="test-result fail">
+            <h3>[FAIL] partial_failure_recovery</h3>
+            <div class="score">Score: 5/10 (50.0%)</div>
+            <div class="checks">
+                <div class="check-item pass">✓ Partial failure detected</div><div class="check-item pass">✓ Rollback executed</div><div class="check-item fail">✗ A2A call SHOPI → FOLIO</div><div class="check-item fail">  → Expected call not found in timeline</div><div class="check-item fail">✗ A2A call SHOPI → PAYME</div><div class="check-item fail">  → Expected call not found in timeline</div><div class="check-item fail">✗ Event keyword 'rollback' found</div><div class="check-item fail">  → Not found in timeline</div><div class="check-item fail">✗ Event keyword 'compensation' found</div><div class="check-item fail">  → Not found in timeline</div><div class="check-item fail">✗ Event keyword 'recovery' found</div><div class="check-item fail">  → Not found in timeline</div>
+            </div>
+        </div>
+
+        <div class="test-result partial">
+            <h3>[PARTIAL] immediate_redemption</h3>
+            <div class="score">Score: 10/11 (90.9%)</div>
+            <div class="checks">
+                <div class="check-item pass">✓ Immediate redemption timing handled</div><div class="check-item pass">✓ Redemption succeeds</div><div class="check-item pass">✓ A2A call FOLIO → RIDIM</div><div class="check-item pass">✓ A2A call RIDIM → VALET</div><div class="check-item pass">✓ A2A call RIDIM → PORTE</div><div class="check-item pass">✓ PORTE → completed</div><div class="check-item pass">✓ Event keyword 'redemption' found</div><div class="check-item pass">✓ Event keyword 'immediate' found</div><div class="check-item fail">✗ Event keyword 'success' found</div><div class="check-item fail">  → Not found in timeline</div>
+            </div>
+        </div>
+
+        <div class="test-result partial">
+            <h3>[PARTIAL] concurrent_redemption</h3>
+            <div class="score">Score: 8/9 (88.9%)</div>
+            <div class="checks">
+                <div class="check-item pass">✓ Concurrent requests handled</div><div class="check-item pass">✓ No state corruption</div><div class="check-item pass">✓ A2A call FOLIO → RIDIM</div><div class="check-item pass">✓ Event keyword 'concurrent' found</div><div class="check-item pass">✓ Event keyword 'redemption' found</div><div class="check-item fail">✗ Event keyword 'handled' found</div><div class="check-item fail">  → Not found in timeline</div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="section">
+        <h2>💰 Business Logic Tests (Calculations)</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Test Name</th>
+                    <th>Description</th>
+                    <th>Type</th>
+                    <th>Result</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr>
+                    <td><strong>linear_curve_start</strong></td>
+                    <td>Linear bonding curve at start (0 supply)</td>
+                    <td>bonding_curve</td>
+                    <td class="pass">✓ PASS</td>
+                </tr>
+
+                <tr>
+                    <td><strong>linear_curve_midpoint</strong></td>
+                    <td>Linear bonding curve at midpoint (50% sold)</td>
+                    <td>bonding_curve</td>
+                    <td class="pass">✓ PASS</td>
+                </tr>
+
+                <tr>
+                    <td><strong>linear_curve_near_sellout</strong></td>
+                    <td>Linear bonding curve near sellout (90% sold)</td>
+                    <td>bonding_curve</td>
+                    <td class="pass">✓ PASS</td>
+                </tr>
+
+                <tr>
+                    <td><strong>exponential_curve_start</strong></td>
+                    <td>Exponential bonding curve at start</td>
+                    <td>bonding_curve</td>
+                    <td class="pass">✓ PASS</td>
+                </tr>
+
+                <tr>
+                    <td><strong>tier_1_reward</strong></td>
+                    <td>Tier 1 (lowest) reward calculation</td>
+                    <td>reward</td>
+                    <td class="pass">✓ PASS</td>
+                </tr>
+
+                <tr>
+                    <td><strong>tier_3_reward</strong></td>
+                    <td>Tier 3 reward calculation</td>
+                    <td>reward</td>
+                    <td class="pass">✓ PASS</td>
+                </tr>
+
+                <tr>
+                    <td><strong>attribution_reward</strong></td>
+                    <td>Attribution reward with direct and indirect sales</td>
+                    <td>reward</td>
+                    <td class="pass">✓ PASS</td>
+                </tr>
+
+                <tr>
+                    <td><strong>simple_yield_30_days</strong></td>
+                    <td>Simple yield for 30 days at 5% APY</td>
+                    <td>yield</td>
+                    <td class="pass">✓ PASS</td>
+                </tr>
+
+                <tr>
+                    <td><strong>compounding_yield_90_days</strong></td>
+                    <td>Compound yield for 90 days at 5% APY</td>
+                    <td>yield</td>
+                    <td class="pass">✓ PASS</td>
+                </tr>
+
+                <tr>
+                    <td><strong>positive_roi</strong></td>
+                    <td>Campaign with positive ROI</td>
+                    <td>roi</td>
+                    <td class="pass">✓ PASS</td>
+                </tr>
+
+                <tr>
+                    <td><strong>pvt_velocity_50_percent</strong></td>
+                    <td>PVT velocity at 50% sellout</td>
+                    <td>roi</td>
+                    <td class="pass">✓ PASS</td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>✅ Graph Validation</h2>
+        <div class="test-result {'pass' if validation_ok else 'fail'}">
+            <h3>Graph Integrity Checks</h3>
+            <div class="checks">
+<div class="check-item pass">All graph integrity checks passed.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📋 NANDA Protocol Compliance</h2>
+        <div class="test-result {'pass' if nanda_ok else 'fail'}">
+            <h3>NANDA Protocol Validation</h3>
+            <div class="checks">
+<div class="check-item fail">Edge PORTE → VALET: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge PORTE → PROMO: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge PORTE → RIDIM: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge DASHB → VALET: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge DASHB → MARKT: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge DASHB → PROMO: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge RIDIM → FOLIO: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge MARKT → FOLIO: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge SHOPI → PROMO: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge SHOPI → VALET: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge SHOPI → MIRO: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge DASHC → VALET: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge DASHC → PAYME: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge DASHC → PROMO: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge DASHC → FOLIO: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge FOLIO → PAYME: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge FOLIO → PROMO: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge PROMO → VALET: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge PROMO → PAYME: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge PROMO → SHOPI: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge PAYME → FOLIO: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge PAYME → PROMO: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge PAYME → SHOPI: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge PAYME → VALET: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge DEFIME → PAYME: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge DEFIME → FOLIO: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge ICP_ID → VALET: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge ICP_ID → SHOPI: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge ICP_ID → FOLIO: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge ICP_ID → PAYME: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge ICP_ID → PROMO: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge ICP_ID → MARKT: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge ICP_ID → RIDIM: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge PAYOUT → DASHB: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge PAYOUT → VALET: intent is 'unspecified', must be specified</div><div class="check-item fail">Edge MIRO → SHOPI: intent is 'unspecified', must be specified</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📝 Notes</h2>
+        <p>This report was generated automatically from the RAMM agent test suite.</p>
+        <p>For more information, visit the project repository or run tests locally.</p>
+    </div>
+
+</body>
+</html>

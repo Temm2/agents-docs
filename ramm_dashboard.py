@@ -1,0 +1,13 @@
+"""
+Streamlit entrypoint for the RAMM agent dashboard.
+
+Run with:
+    streamlit run ramm_dashboard.py
+"""
+
+from app.dashboard import main
+
+
+if __name__ == "__main__":
+    main()
+
