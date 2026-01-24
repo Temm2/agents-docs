@@ -131,40 +131,77 @@ A decentralized agent-based system deployed on Internet Computer (ICP) where:
 
 ### FR1: Agent Network Architecture on ICP
 
-**Requirement:** The system must support 14 distinct agents, each deployed as an ICP canister with defined roles and responsibilities.
+**Requirement:** The system must support 14 distinct agents deployed across multiple ICP canisters, with some agents sharing canisters as sub-agents of their parent agents.
 
 **ICP Deployment Model:**
-- Each agent = one ICP canister
+- Agents may share canisters (sub-agents share parent canister)
 - Canisters communicate via inter-canister calls (A2A protocol)
 - State stored in stable memory (persistent across upgrades)
 - Authentication via Internet Identity (ICP_ID canister)
 - Network-enforced security and resilience
 
-**Agents (Canisters):**
-- **VALET**: Campaign orchestrator, brand onboarding, AI-generated campaigns
+**Agent-to-Canister Mapping:**
+
+| Canister | Agents | Type | Description |
+|----------|--------|------|-------------|
+| **VALET Canister** | VALET, PORTE | Application | VALET (main) + PORTE (sub-agent) share canister |
+| **DASHB Canister** | DASHB, DASHC | Data | DASHB (main) + DASHC (sub-agent) share canister |
+| **SHOPI Canister** | SHOPI | Application | Shopping journey, personalization |
+| **MARKT Canister** | MARKT | Application | Core AMM, swaps (USDC ↔ PVT) |
+| **RIDIM Canister** | RIDIM | Application | PVT redemption orchestration |
+| **PROMO Canister** | PROMO | Application | Influencer & affiliate management |
+| **FOLIO Canister** | FOLIO | Application | PVT wallet management |
+| **PAYME Canister** | PAYME | Finance | Escrow handling, payment execution |
+| **DEFIME Canister** | DEFIME | Finance | Yield management, DeFi integration |
+| **ICP_ID Canister** | ICP_ID | Identity | Internet Identity integration |
+| **PAYOUT Canister** | PAYOUT | Finance | Fund withdrawal (under consideration) |
+| **MIRO/BRAT** | External | External | Visual feedback agent (external integration) |
+
+**Agent Details:**
+- **VALET**: Campaign orchestrator, brand onboarding, AI-generated campaigns (main agent)
+- **PORTE**: Digital Product Passport (DPP) creation and NFT minting (VALET sub-agent, shared canister)
+- **DASHB**: Brand dashboard, campaign analytics, portfolio view (main agent)
+- **DASHC**: Shopper analytics, engagement metrics (DASHB sub-agent, shared canister)
 - **SHOPI**: Shopping journey, personalization, product recommendations
 - **MARKT**: Core AMM, manages swaps (USDC ↔ PVT), liquidity tracking
-- **FOLIO**: PVT wallet management, redemption, gifting, reselling
-- **PROMO**: Influencer & affiliate management, attribution logic
-- **PAYME**: Escrow handling, payment execution, reward payouts
 - **RIDIM**: PVT redemption orchestration, DPP minting coordination
-- **PORTE**: Digital Product Passport (DPP) creation and NFT minting
-- **DASHB**: Brand dashboard, campaign analytics, portfolio view
-- **DASHC**: Shopper analytics, engagement metrics
+- **PROMO**: Influencer & affiliate management, attribution logic
+- **FOLIO**: PVT wallet management, redemption, gifting, reselling
+- **PAYME**: Escrow handling, payment execution, reward payouts
 - **DEFIME**: Yield management, DeFi integration
-- **ICP_ID**: Identity and authentication layer
-- **MIRO/BRAT**: Visual feedback agent for shoppers
-- **PAYOUT**: Fund withdrawal and settlement
+- **ICP_ID**: Identity and authentication layer (Internet Identity wrapper)
+- **MIRO/BRAT**: Visual feedback agent for shoppers (external to marketplace, integration TBD)
+- **PAYOUT**: Fund withdrawal and settlement (under consideration)
 
-**ICP Canister Mapping:**
-- **Brand Services Subnet**: VALET, PORTE, DASHB, PROMO canisters
-- **Shopper Services Subnet**: SHOPI, DASHC, FOLIO, MIRO canisters
+**ICP Canister Subnet Distribution:**
+- **Brand Services Subnet**: VALET (with PORTE), DASHB (with DASHC), PROMO canisters
+- **Shopper Services Subnet**: SHOPI, FOLIO canisters
 - **Finance Services Subnet**: PAYME, DEFIME, PAYOUT canisters (high-security)
 - **Marketplace Subnet**: MARKT canister
 - **Redemption Subnet**: RIDIM canister
 - **Identity Layer**: ICP_ID canister (Internet Identity integration)
+- **External Integration**: MIRO/BRAT (external agent, integration method TBD)
 
-**Validation:** Graph integrity checks ensure all agents are reachable and have valid A2A edges. Python model validates canister communication patterns before ICP deployment.
+**Sub-Agent Architecture:**
+- **PORTE as VALET Sub-Agent**: PORTE shares VALET canister, handles DPP operations as part of VALET's campaign lifecycle
+- **DASHC as DASHB Sub-Agent**: DASHC shares DASHB canister, provides shopper analytics alongside brand analytics
+- **Shared State**: Sub-agents share stable memory with parent agent for efficient data access
+- **Internal Communication**: Sub-agents communicate with parent via internal canister methods (not inter-canister calls)
+
+**MIRO/BRAT External Integration:**
+- MIRO/BRAT is an external agent already built outside the marketplace
+- Integration options:
+  1. **External Service Call**: SHOPI canister calls MIRO/BRAT via HTTP/API (not inter-canister)
+  2. **Separate Canister**: Deploy MIRO/BRAT as independent ICP canister if needed
+  3. **Embedded Module**: Integrate MIRO/BRAT functionality into SHOPI canister
+- Decision pending based on MIRO/BRAT architecture and requirements
+
+**PAYOUT Status:**
+- Currently under consideration
+- If implemented, will be deployed as separate finance canister
+- May share canister with PAYME if functionality overlaps
+
+**Validation:** Graph integrity checks ensure all agents are reachable and have valid A2A edges. Python model validates canister communication patterns before ICP deployment. Sub-agent relationships are modeled as internal canister operations.
 
 ---
 
@@ -976,14 +1013,34 @@ Response: Certified data returned to shopi-canister
 - immediate_redemption
 - concurrent_redemption
 
-### B. Agent Roles
+### B. Agent Roles and Canister Mapping
 
-- **Brand-Facing**: VALET, PORTE, DASHB, PROMO
-- **Shopper-Facing**: SHOPI, DASHC, FOLIO, RIDIM, MIRO
-- **Finance**: MARKT, PAYME, DEFIME, PAYOUT
-- **Data**: DASHB, DASHC
-- **Identity**: ICP_ID
-- **Utility**: MIRO/BRAT
+**Brand-Facing:**
+- VALET (main agent, own canister with PORTE sub-agent)
+- PORTE (sub-agent, shares VALET canister)
+- DASHB (main agent, own canister with DASHC sub-agent)
+- DASHC (sub-agent, shares DASHB canister)
+- PROMO (own canister)
+
+**Shopper-Facing:**
+- SHOPI (own canister)
+- FOLIO (own canister)
+- RIDIM (own canister)
+- MIRO/BRAT (external, integration TBD)
+
+**Finance:**
+- MARKT (own canister)
+- PAYME (own canister)
+- DEFIME (own canister)
+- PAYOUT (under consideration, own canister if implemented)
+
+**Identity:**
+- ICP_ID (own canister)
+
+**Canister Summary:**
+- 10 confirmed canisters (VALET+PORTE, DASHB+DASHC, SHOPI, MARKT, RIDIM, PROMO, FOLIO, PAYME, DEFIME, ICP_ID)
+- 1 under consideration (PAYOUT)
+- 1 external integration (MIRO/BRAT)
 
 ### C. State Change Matrix
 
