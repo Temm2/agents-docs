@@ -30,14 +30,14 @@ The system can be deployed on multiple blockchain protocols, each with protocol-
 3. **Optimism** - Smart contract deployment on Ethereum L2
 4. **Any L2** - General Layer 2 deployment considerations
 
-Each protocol section below details how the same agent logic maps to protocol-specific deployment units and communication mechanisms.
+Protocol-specific deployment details are documented in the Appendices (A-D). The core agent logic, NANDA protocol structure, and Python tests remain invariant across all protocols.
 
 ### Architecture Model
 
 The system is implemented as a Python modeling framework that maps conceptually to protocol-specific deployment units:
-- **ICP**: Canisters (inter-canister calls, stable memory, Internet Identity)
-- **Base/Optimism/L2**: Smart contracts (contract calls, storage, wallet authentication)
-- **Common**: Agent behavior, state machines, business logic (protocol-agnostic)
+- **Core Logic**: Agent behavior, state machines, business logic (protocol-agnostic, tested in Python)
+- **Protocol Adapter**: Protocol-specific implementation layer (see Protocol Abstraction Layer section)
+- **Deployment Units**: Canisters (ICP), Smart Contracts (L2s), etc. (protocol-specific)
 
 The Python framework focuses on agent behavior, state transitions, and decision flows, providing a testable model before protocol-specific deployment.
 
@@ -63,16 +63,15 @@ The Python framework focuses on agent behavior, state transitions, and decision 
 ### Solution
 A decentralized agent-based system deployable across multiple blockchain protocols where:
 - **Core Logic**: Protocol-agnostic agent behavior, state machines, and business rules (tested in Python)
-- **Protocol-Specific Deployment**: 
-  - **ICP**: Canisters with inter-canister calls, stable memory, Internet Identity
-  - **Base/Optimism/L2**: Smart contracts with contract calls, storage, wallet authentication
+- **Protocol Abstraction**: Protocol adapter layer defines required capabilities (see Protocol Abstraction Layer)
+- **Protocol-Specific Deployment**: Implementation details vary by protocol (see Appendices A-D)
 - Agents communicate via structured A2A protocol (NANDA) using protocol-specific mechanisms
-- State persistence handled by protocol-native storage (stable memory for ICP, contract storage for L2s)
+- State persistence handled by protocol-native storage
 - All operations authenticated via protocol-native identity systems
 - Business logic is deterministic and testable before protocol deployment
 - Multi-chain token operations enabled via protocol-specific bridges/technologies
 - Self-writing AI capabilities for dynamic campaign generation (VALET agent)
-- Protocol-native security features (network-enforced for ICP, smart contract security for L2s)
+- Protocol-native security features
 
 ---
 
@@ -80,34 +79,35 @@ A decentralized agent-based system deployable across multiple blockchain protoco
 
 ### Goals
 
-1. **Modular Agent Architecture on ICP**
-   - Each agent is independently deployable as an ICP canister
-   - Canisters communicate via inter-canister calls (structured A2A protocol)
+1. **Modular Agent Architecture (Protocol-Agnostic)**
+   - Each agent is independently deployable (as canister, contract, etc. depending on protocol)
+   - Agents communicate via structured A2A protocol (NANDA)
    - Clear separation of concerns (brand, shopper, finance, data, identity)
-   - Network-enforced isolation and security
-   - Canister upgrades without state loss (stable memory persistence)
+   - Protocol-native isolation and security
+   - State persistence across upgrades (protocol-specific mechanism)
 
-2. **Deterministic State Management on ICP**
-   - All state transitions are validated and stored in stable memory
-   - State-changing operations are authenticated via Internet Identity
-   - State machine rules are enforced at the canister level
-   - Certified data ensures data integrity and tamperproof verification
-   - State persists across canister upgrades
+2. **Deterministic State Management (Protocol-Agnostic)**
+   - All state transitions are validated (tested in Python)
+   - State-changing operations are authenticated (protocol-specific mechanism)
+   - State machine rules are enforced (protocol-specific enforcement)
+   - Data integrity ensured (protocol-specific guarantees)
+   - State persists across upgrades (protocol-specific persistence)
 
-3. **Comprehensive Testing**
+3. **Comprehensive Testing (Protocol-Agnostic)**
    - Logic tests validate agent behavior (16 scenarios)
    - Business logic tests validate calculations (11 tests)
    - Graph validation ensures network integrity
+   - NANDA compliance validation
 
-4. **Security & Compliance on ICP**
-   - All commands require Internet Identity authentication (ICP_ID agent)
-   - Network-enforced tamperproof execution prevents traditional attacks
+4. **Security & Compliance (Protocol-Agnostic Logic, Protocol-Specific Enforcement)**
+   - All commands require authentication (protocol-specific mechanism)
+   - Protocol-native tamperproof execution
    - Replay attack prevention via idempotency and nonce validation
-   - Race condition handling with canister-level atomicity
+   - Race condition handling with protocol-native atomicity
    - Boundary condition validation enforced at execution layer
-   - Guaranteed uptime and unstoppable execution
+   - Protocol-native uptime and execution guarantees
 
-5. **Business Logic Correctness**
+5. **Business Logic Correctness (Protocol-Agnostic)**
    - Bonding curve pricing (linear, exponential, logarithmic)
    - Reward calculations (tiered, attribution-based)
    - Yield calculations (simple, compound)
@@ -115,17 +115,17 @@ A decentralized agent-based system deployable across multiple blockchain protoco
 
 ### Non-Goals
 
-1. **Not a Full ICP Canister Implementation (Current Phase)**
+1. **Not a Full Protocol Implementation (Current Phase)**
    - This is a Python modeling framework for testing logic and behavior
-   - Actual ICP canister deployment (Motoko/Rust) is the next phase
-   - Focus is on validating agent logic, state transitions, and business rules before ICP deployment
-   - Python model serves as specification for canister implementation
+   - Actual protocol deployment (canisters/contracts) is the next phase
+   - Focus is on validating agent logic, state transitions, and business rules before protocol deployment
+   - Python model serves as specification for protocol implementation
 
 2. **Not a Production System (Yet)**
    - No real wallet integration (uses mock data)
    - No actual blockchain transactions (simulated)
    - Mock data only for testing agent logic
-   - Production deployment requires ICP canister implementation
+   - Production deployment requires protocol-specific implementation
 
 3. **Not a Complete Feature Set**
    - Some NANDA intents are "unspecified" (work in progress - 35 edges need specification)
@@ -135,7 +135,7 @@ A decentralized agent-based system deployable across multiple blockchain protoco
 4. **Not a User Interface**
    - No frontend implementation
    - Streamlit dashboard is for testing/visualization only
-   - Production UI/UX will be built on ICP (canister-hosted web assets)
+   - Production UI/UX will be built on protocol-native hosting
 
 ---
 
@@ -143,39 +143,15 @@ A decentralized agent-based system deployable across multiple blockchain protoco
 
 ### FR1: Agent Network Architecture (Protocol-Agnostic)
 
-**Requirement:** The system must support 14 distinct agents with defined roles and responsibilities. The agent logic is protocol-agnostic, but deployment architecture varies by protocol.
+**Requirement:** The system must support 14 distinct agents with defined roles and responsibilities. The agent logic is protocol-agnostic, but deployment architecture varies by protocol (see Protocol Abstraction Layer and Appendices).
 
 **Protocol-Agnostic Agent Definitions:**
 
-**ICP Deployment Model:**
-- Agents may share canisters (sub-agents share parent canister)
-- Canisters communicate via inter-canister calls (A2A protocol)
-- State stored in stable memory (persistent across upgrades)
-- Authentication via Internet Identity (ICP_ID canister)
-- Network-enforced security and resilience
-
-**Agent-to-Canister Mapping:**
-
-| Canister | Agents | Type | Description |
-|----------|--------|------|-------------|
-| **VALET Canister** | VALET, PORTE | Application | VALET (main) + PORTE (sub-agent) share canister |
-| **DASHB Canister** | DASHB, DASHC | Data | DASHB (main) + DASHC (sub-agent) share canister |
-| **SHOPI Canister** | SHOPI | Application | Shopping journey, personalization |
-| **MARKT Canister** | MARKT | Application | Core AMM, swaps (USDC ↔ PVT) |
-| **RIDIM Canister** | RIDIM | Application | PVT redemption orchestration |
-| **PROMO Canister** | PROMO | Application | Influencer & affiliate management |
-| **FOLIO Canister** | FOLIO | Application | PVT wallet management |
-| **PAYME Canister** | PAYME | Finance | Escrow handling, payment execution |
-| **DEFIME Canister** | DEFIME | Finance | Yield management, DeFi integration |
-| **ICP_ID Canister** | ICP_ID | Identity | Internet Identity integration |
-| **PAYOUT Canister** | PAYOUT | Finance | Fund withdrawal (under consideration) |
-| **MIRO/BRAT** | External | External | Visual feedback agent (external integration) |
-
 **Agent Details:**
 - **VALET**: Campaign orchestrator, brand onboarding, AI-generated campaigns (main agent)
-- **PORTE**: Digital Product Passport (DPP) creation and NFT minting (VALET sub-agent, shared canister)
+- **PORTE**: Digital Product Passport (DPP) creation and NFT minting (VALET sub-agent)
 - **DASHB**: Brand dashboard, campaign analytics, portfolio view (main agent)
-- **DASHC**: Shopper analytics, engagement metrics (DASHB sub-agent, shared canister)
+- **DASHC**: Shopper analytics, engagement metrics (DASHB sub-agent)
 - **SHOPI**: Shopping journey, personalization, product recommendations
 - **MARKT**: Core AMM, manages swaps (USDC ↔ PVT), liquidity tracking
 - **RIDIM**: PVT redemption orchestration, DPP minting coordination
@@ -183,143 +159,39 @@ A decentralized agent-based system deployable across multiple blockchain protoco
 - **FOLIO**: PVT wallet management, redemption, gifting, reselling
 - **PAYME**: Escrow handling, payment execution, reward payouts
 - **DEFIME**: Yield management, DeFi integration
-- **ICP_ID**: Identity and authentication layer (Internet Identity wrapper)
+- **ICP_ID**: Identity and authentication layer (protocol-specific implementation)
 - **MIRO/BRAT**: Visual feedback agent for shoppers (external to marketplace, integration TBD)
 - **PAYOUT**: Fund withdrawal and settlement (under consideration)
 
-**ICP Canister Subnet Distribution:**
-- **Brand Services Subnet**: VALET (with PORTE), DASHB (with DASHC), PROMO canisters
-- **Shopper Services Subnet**: SHOPI, FOLIO canisters
-- **Finance Services Subnet**: PAYME, DEFIME, PAYOUT canisters (high-security)
-- **Marketplace Subnet**: MARKT canister
-- **Redemption Subnet**: RIDIM canister
-- **Identity Layer**: ICP_ID canister (Internet Identity integration)
-- **External Integration**: MIRO/BRAT (external agent, integration method TBD)
-
 **Sub-Agent Architecture:**
-- **PORTE as VALET Sub-Agent**: PORTE shares VALET canister, handles DPP operations as part of VALET's campaign lifecycle
-- **DASHC as DASHB Sub-Agent**: DASHC shares DASHB canister, provides shopper analytics alongside brand analytics
-- **Shared State**: Sub-agents share stable memory with parent agent for efficient data access
-- **Internal Communication**: Sub-agents communicate with parent via internal canister methods (not inter-canister calls)
+- **PORTE as VALET Sub-Agent**: PORTE shares deployment unit with VALET (canister for ICP, library for L2s)
+- **DASHC as DASHB Sub-Agent**: DASHC shares deployment unit with DASHB
+- **Shared State**: Sub-agents share storage with parent agent for efficient data access
+- **Internal Communication**: Sub-agents communicate with parent via internal methods (not A2A calls)
 
 **MIRO/BRAT External Integration:**
 - MIRO/BRAT is an external agent already built outside the marketplace
-- Integration options:
-  1. **External Service Call**: SHOPI canister calls MIRO/BRAT via HTTP/API (not inter-canister)
-  2. **Separate Canister**: Deploy MIRO/BRAT as independent ICP canister if needed
-  3. **Embedded Module**: Integrate MIRO/BRAT functionality into SHOPI canister
+- Integration method depends on protocol (see protocol-specific appendices)
 - Decision pending based on MIRO/BRAT architecture and requirements
 
 **PAYOUT Status:**
 - Currently under consideration
-- If implemented, will be deployed as separate finance canister
-- May share canister with PAYME if functionality overlaps
+- If implemented, will be deployed as separate finance unit
+- May share deployment unit with PAYME if functionality overlaps
 
-**ICP Validation:** Graph integrity checks ensure all agents are reachable and have valid A2A edges. Python model validates canister communication patterns before ICP deployment. Sub-agent relationships are modeled as internal canister operations.
-
-#### FR1.2: Base (Ethereum L2) Deployment
-
-**Base Deployment Model:**
-- Each agent deployed as smart contract(s) on Base
-- Contracts communicate via contract calls (A2A protocol via function calls)
-- State stored in contract storage (persistent, gas-optimized)
-- Authentication via wallet signatures (EIP-712, wallet-based)
-- EVM security model (reentrancy guards, access control)
-
-**Base Agent-to-Contract Mapping:**
-
-| Contract | Agents | Type | Description |
-|----------|--------|------|-------------|
-| **ValetContract** | VALET, PORTE | Main + Library | VALET (main contract) + PORTE (library/module) |
-| **DashboardContract** | DASHB, DASHC | Main + Library | DASHB (main contract) + DASHC (library/module) |
-| **ShopiContract** | SHOPI | Standalone | Shopping journey, personalization |
-| **MarktContract** | MARKT | Standalone | Core AMM, swaps (USDC ↔ PVT) |
-| **RidimContract** | RIDIM | Standalone | PVT redemption orchestration |
-| **PromoContract** | PROMO | Standalone | Influencer & affiliate management |
-| **FolioContract** | FOLIO | Standalone | PVT wallet management (ERC-721/1155) |
-| **PaymeContract** | PAYME | Standalone | Escrow handling, payment execution |
-| **DefimeContract** | DEFIME | Standalone | Yield management, DeFi integration |
-| **IdentityContract** | ICP_ID | Standalone | Identity verification (wallet-based) |
-| **PayoutContract** | PAYOUT | Standalone | Fund withdrawal (under consideration) |
-
-**Base-Specific Considerations:**
-- **Gas Optimization**: Sub-agents (PORTE, DASHC) implemented as libraries to reduce gas costs
-- **Storage**: Contract storage for state (optimized for gas efficiency)
-- **Authentication**: Wallet signatures (MetaMask, WalletConnect) instead of Internet Identity
-- **Token Standards**: ERC-20 for PVTs, ERC-721/1155 for DPP NFTs
-- **Bridge Integration**: Base's native bridge for multi-chain operations
-- **L2 Benefits**: Lower gas costs, faster transactions, Ethereum security
-
-**Base Validation:** Python model validates contract interaction patterns. Smart contract security audits required before deployment.
-
-#### FR1.3: Optimism (Ethereum L2) Deployment
-
-**Optimism Deployment Model:**
-- Similar to Base (Ethereum L2 with optimistic rollups)
-- Each agent deployed as smart contract(s) on Optimism
-- Contracts communicate via contract calls (A2A protocol)
-- State stored in contract storage
-- Authentication via wallet signatures
-- Optimistic rollup security model
-
-**Optimism Agent-to-Contract Mapping:**
-- Same structure as Base (see FR1.2)
-- Contracts deployed on Optimism mainnet
-- Optimism-specific bridge for multi-chain operations
-
-**Optimism-Specific Considerations:**
-- **Optimistic Rollups**: Faster finality, lower costs, Ethereum security
-- **Bridge Integration**: Optimism's native bridge for cross-chain operations
-- **Gas Optimization**: Similar to Base (libraries for sub-agents)
-- **Token Standards**: Same as Base (ERC-20, ERC-721/1155)
-- **Fault Proofs**: Optimism's security model for dispute resolution
-
-**Optimism Validation:** Python model validates contract interaction patterns. Smart contract security audits required before deployment.
-
-#### FR1.4: General L2 Deployment
-
-**L2 Deployment Model:**
-- Applicable to any Ethereum-compatible L2 (Arbitrum, Polygon, zkSync, etc.)
-- Each agent deployed as smart contract(s) on chosen L2
-- Contracts communicate via contract calls (A2A protocol)
-- State stored in contract storage
-- Authentication via wallet signatures
-- L2-specific security and bridge mechanisms
-
-**L2-Specific Considerations:**
-- **L2 Type**: zk-rollup, optimistic rollup, or sidechain
-- **Bridge Integration**: L2-specific bridge for cross-chain operations
-- **Token Standards**: ERC-20 for PVTs, ERC-721/1155 for DPP NFTs
-- **Gas Costs**: L2-specific gas optimization strategies
-- **Finality**: L2-specific finality times and security guarantees
-- **Compatibility**: EVM-compatible L2s preferred for code reuse
-
-**L2 Validation:** Python model validates contract interaction patterns. L2-specific security audits and bridge testing required.
-
-**Protocol-Agnostic Validation:** Graph integrity checks ensure all agents are reachable and have valid A2A edges. Python model validates agent communication patterns before protocol-specific deployment. Sub-agent relationships are modeled as internal operations (canister methods for ICP, library calls for L2s).
+**Protocol-Agnostic Validation:** Graph integrity checks ensure all agents are reachable and have valid A2A edges. Python model validates agent communication patterns before protocol-specific deployment. Sub-agent relationships are modeled as internal operations.
 
 ---
 
 ### FR2: A2A Communication Protocol (NANDA) - Protocol-Agnostic
 
-**Requirement:** All agent-to-agent communication must use NANDA protocol structure. The protocol is protocol-agnostic, but implementation mechanism varies by deployment target.
+**Requirement:** All agent-to-agent communication must use NANDA protocol structure. The protocol structure is protocol-agnostic, but implementation mechanism varies by deployment target (see Protocol Abstraction Layer and Appendices).
 
 **Protocol-Agnostic NANDA Structure:**
 - All A2A edges use NANDA protocol (protocol-agnostic)
 - Protocol-specific implementation varies by deployment target
 - All calls authenticated via protocol-native identity systems
 - Message delivery and execution handled by protocol-native mechanisms
-
-**Protocol-Specific Implementations:**
-
-#### FR2.1: ICP Implementation (Inter-Canister Calls)
-
-**ICP Implementation:**
-- A2A edges map to inter-canister calls on ICP
-- Calls are async and non-atomic (require state machines)
-- All calls authenticated via Internet Identity (ICP_ID canister)
-- Network-enforced message delivery and execution
-- Certified data ensures message integrity
 
 **NANDA Structure:**
 - `protocol`: Must be "NANDA"
@@ -335,43 +207,6 @@ A decentralized agent-based system deployable across multiple blockchain protoco
 - `respond`: Reply to query/request (no state change)
 - `event`: Broadcast state change (event emission)
 
-**ICP Inter-Canister Call Flow:**
-```
-Python Model: SHOPI → VALET (query, campaign.list_active)
-    ↓
-ICP Canister: shopi-canister → valet-canister (inter-canister call)
-    ↓
-Method: query_campaigns(filters, limit, offset)
-    ↓
-Storage: Query from stable memory (read-only, no state change)
-    ↓
-Response: Certified data returned to shopi-canister
-```
-
-#### FR2.2: Base/Optimism/L2 Implementation (Contract Calls)
-
-**L2 Implementation:**
-- A2A edges map to smart contract function calls
-- Calls are synchronous (EVM) or async (depending on L2)
-- All calls authenticated via wallet signatures (EIP-712)
-- Contract-level access control ensures message integrity
-- Events emitted for cross-contract communication
-
-**L2 Contract Call Flow:**
-```
-Python Model: SHOPI → VALET (query, campaign.list_active)
-    ↓
-L2 Contracts: ShopiContract → ValetContract (function call)
-    ↓
-Function: queryCampaigns(filters, limit, offset)
-    ↓
-Storage: Query from contract storage (read-only, no state change)
-    ↓
-Response: Return data to ShopiContract
-    ↓
-Event: CampaignQuery event emitted (optional)
-```
-
 **Protocol-Agnostic Validation:** NANDA compliance validator checks all edges comply with protocol structure. Python model validates communication patterns before protocol-specific deployment.
 
 **Current Status:** 35 edges have "unspecified" intents (work in progress - must be specified before any protocol deployment).
@@ -380,24 +215,12 @@ Event: CampaignQuery event emitted (optional)
 
 ### FR3: State Management (Protocol-Agnostic)
 
-**Requirement:** Agents must manage state transitions according to defined state machine. State machine logic is protocol-agnostic, but storage mechanism varies by protocol.
+**Requirement:** Agents must manage state transitions according to defined state machine. State machine logic is protocol-agnostic, but storage mechanism varies by protocol (see Protocol Abstraction Layer and Appendices).
 
 **Protocol-Agnostic State Machine:**
 - State transitions (IDLE → CONFIGURING → ACTIVE → SETTLING → COMPLETED) are protocol-independent
 - State machine logic tested in Python model (protocol-agnostic)
 - State persistence handled by protocol-native storage mechanisms
-
-**Protocol-Specific State Storage:**
-
-#### FR3.1: ICP State Storage
-
-**ICP State Storage:**
-- **Stable Memory**: Persistent storage for critical state (campaigns, transactions, ownership)
-  - Survives canister upgrades
-  - Used for: campaign configs, transaction logs, PVT ownership, redemption records
-- **Heap Memory**: Temporary storage (cleared on upgrade)
-  - Used for: AI model caching (VALET), temporary calculations, query results
-- **Certified Data**: Integrity-verified data (ICP_ID, critical validations)
 
 **Agent Phases:**
 - `IDLE`: Initial state, no active operations
@@ -421,49 +244,19 @@ Event: CampaignQuery event emitted (optional)
 - Auth verification (read-only)
 - Analytics events (read-only from sender perspective)
 
-**ICP State Persistence:**
-- State changes written to stable memory atomically
-- Canister upgrades preserve state in stable memory
-- State machine transitions validated before execution
-- Certified data ensures state integrity
-
-#### FR3.2: Base/Optimism/L2 State Storage
-
-**L2 State Storage:**
-- **Contract Storage**: Persistent storage for critical state (campaigns, transactions, ownership)
-  - Stored in contract state variables
-  - Used for: campaign configs, transaction logs, PVT ownership, redemption records
-  - Gas-optimized storage patterns (packed structs, mappings)
-- **Memory**: Temporary storage (cleared after transaction)
-  - Used for: Temporary calculations, query results
-  - No persistent caching (recalculate on each call)
-
-**L2 State Persistence:**
-- State changes written to contract storage (on-chain, immutable)
-- Contract upgrades require proxy patterns or migration
-- State machine transitions validated in smart contract logic
-- Blockchain immutability ensures state integrity
-
 **Protocol-Agnostic Validation:** Test scenarios validate state transitions match expected behavior. Python model ensures state machine logic is correct before protocol-specific deployment.
 
 ---
 
-### FR4: Authentication & Authorization (Protocol-Specific)
+### FR4: Authentication & Authorization (Protocol-Agnostic Logic)
 
-**Requirement:** All state-changing operations must be authenticated. Authentication mechanism is protocol-specific, but authorization logic is protocol-agnostic.
+**Requirement:** All state-changing operations must be authenticated. Authentication mechanism is protocol-specific, but authorization logic is protocol-agnostic (see Protocol Abstraction Layer and Appendices).
 
-**ICP Internet Identity Integration:**
-- ICP_ID canister wraps ICP's Internet Identity system
-- Decentralized identity without private key management
-- Principal-based authentication for all canister calls
-- Network-enforced authentication (tamperproof)
-
-**Flow:**
-1. Agent (canister) wants to execute command
-2. Agent → ICP_ID canister: `auth.verify_principal(principal)` (inter-canister call)
-3. ICP_ID validates principal via Internet Identity
-4. ICP_ID → Agent: Authentication result (certified data)
-5. If valid, command proceeds; if invalid, command rejected (network-enforced)
+**Protocol-Agnostic Authorization Logic:**
+- All state-changing operations require authentication
+- Authentication result must be verified before command execution
+- Unauthorized commands must be rejected
+- Authentication mechanism is protocol-specific (see Protocol Abstraction Layer)
 
 **Critical Commands Requiring Auth:**
 - PVT minting (FOLIO)
@@ -471,13 +264,7 @@ Event: CampaignQuery event emitted (optional)
 - DPP minting (PORTE)
 - Campaign activation (VALET)
 
-**ICP Security Benefits:**
-- Network-enforced authentication (cannot be bypassed)
-- No private key management required (Internet Identity handles this)
-- Tamperproof principal verification
-- Certified authentication results
-
-**Validation:** Security test scenarios verify unauthorized commands are rejected. Python model validates authentication logic before ICP deployment.
+**Validation:** Security test scenarios verify unauthorized commands are rejected. Python model validates authentication logic before protocol deployment.
 
 ---
 
@@ -620,7 +407,7 @@ Event: CampaignQuery event emitted (optional)
 #### FR9.1: Unauthorized Command Prevention
 
 **Validation:**
-- Commands without ICP_ID auth must be rejected
+- Commands without authentication must be rejected
 - All state-changing operations require auth check
 
 **Test:** `unauthorized_command` scenario validates rejection.
@@ -749,366 +536,84 @@ Event: CampaignQuery event emitted (optional)
 
 ---
 
-## Protocol-Specific Deployment
+## Protocol Abstraction Layer
 
-This section details how the RAMM Agents system works on each supported blockchain protocol. The core agent logic, state machines, and business rules are protocol-agnostic (tested in Python), but deployment architecture, communication mechanisms, and storage vary by protocol.
+**Key Design Choice:** The system defines a protocol abstraction layer that specifies required capabilities, not implementations. This allows the same core agent logic to work across different blockchain protocols.
 
-### How It Works on Internet Computer (ICP)
+### Protocol Interface Requirements
 
-#### Deployment Architecture
+Every protocol implementation must provide the following capabilities:
 
-**Canister-Based Deployment:**
-- Each agent deployed as an ICP canister (or shared canister for sub-agents)
-- Canisters are tamperproof, unstoppable, and serverless by design
-- Network-enforced security and resilience
-- Canister upgrades preserve state in stable memory
+#### 1. Read State
+- **Capability**: Read balances, contract/canister state, ownership records
+- **Protocol-Agnostic**: Query operations return data structures
+- **Protocol-Specific**: Implementation varies (stable memory query for ICP, contract storage read for L2s)
 
-**Agent-to-Canister Mapping:**
+#### 2. Write State
+- **Capability**: Execute transactions that mutate state
+- **Protocol-Agnostic**: Write operations persist state changes
+- **Protocol-Specific**: Implementation varies (inter-canister call for ICP, contract function call for L2s)
 
-| Canister | Agents | Type | Description |
-|----------|--------|------|-------------|
-| **VALET Canister** | VALET, PORTE | Application | VALET (main) + PORTE (sub-agent) share canister |
-| **DASHB Canister** | DASHB, DASHC | Data | DASHB (main) + DASHC (sub-agent) share canister |
-| **SHOPI Canister** | SHOPI | Application | Shopping journey, personalization |
-| **MARKT Canister** | MARKT | Application | Core AMM, swaps (USDC ↔ PVT) |
-| **RIDIM Canister** | RIDIM | Application | PVT redemption orchestration |
-| **PROMO Canister** | PROMO | Application | Influencer & affiliate management |
-| **FOLIO Canister** | FOLIO | Application | PVT wallet management |
-| **PAYME Canister** | PAYME | Finance | Escrow handling, payment execution |
-| **DEFIME Canister** | DEFIME | Finance | Yield management, DeFi integration |
-| **ICP_ID Canister** | ICP_ID | Identity | Internet Identity integration |
-| **PAYOUT Canister** | PAYOUT | Finance | Fund withdrawal (under consideration) |
+#### 3. Identity / Signing
+- **Capability**: Authenticate users and verify authorization
+- **Protocol-Agnostic**: Authentication result (success/failure)
+- **Protocol-Specific**: Implementation varies (Internet Identity for ICP, wallet signatures for L2s)
 
-**Subnet Distribution:**
-- **Brand Services Subnet**: VALET (with PORTE), DASHB (with DASHC), PROMO canisters
-- **Shopper Services Subnet**: SHOPI, FOLIO canisters
-- **Finance Services Subnet**: PAYME, DEFIME, PAYOUT canisters (high-security)
-- **Marketplace Subnet**: MARKT canister
-- **Redemption Subnet**: RIDIM canister
-- **Identity Layer**: ICP_ID canister (Internet Identity integration)
+#### 4. Fee Estimation
+- **Capability**: Estimate transaction costs
+- **Protocol-Agnostic**: Cost estimate in native currency
+- **Protocol-Specific**: Implementation varies (cycles for ICP, gas for L2s)
 
-#### Communication (A2A via Inter-Canister Calls)
+#### 5. Event Confirmation
+- **Capability**: Confirm transaction/operation completion
+- **Protocol-Agnostic**: Confirmation with transaction details
+- **Protocol-Specific**: Implementation varies (certified data for ICP, transaction receipt for L2s)
 
-**NANDA Protocol Implementation:**
-- A2A edges map to inter-canister calls on ICP
-- Calls are async and non-atomic (require state machines)
-- All calls authenticated via Internet Identity (ICP_ID canister)
-- Network-enforced message delivery and execution
-- Certified data ensures message integrity
+### Chain Adapter Layer
 
-**Example Flow:**
-```
-Python Model: SHOPI → VALET (query, campaign.list_active)
-    ↓
-ICP: shopi-canister → valet-canister (inter-canister call)
-    ↓
-Method: query_campaigns(filters, limit, offset)
-    ↓
-Storage: Query from stable memory (read-only)
-    ↓
-Response: Certified data returned to shopi-canister
-```
+The Chain Adapter Layer implements the Protocol Interface for each supported protocol:
 
-#### State Storage
+- **ICP Adapter**: Implements interface using canisters, inter-canister calls, stable memory, Internet Identity
+- **Base Adapter**: Implements interface using smart contracts, contract calls, contract storage, wallet signatures
+- **Optimism Adapter**: Implements interface using smart contracts, contract calls, contract storage, wallet signatures
+- **L2 Adapter**: Implements interface using L2-specific mechanisms (varies by L2 type)
 
-**Stable Memory:**
-- Persistent storage for critical state (campaigns, transactions, ownership)
-- Survives canister upgrades
-- Used for: campaign configs, transaction logs, PVT ownership, redemption records
+### Execution Environment
 
-**Heap Memory:**
-- Temporary storage (cleared on upgrade)
-- Used for: AI model caching (VALET), temporary calculations, query results
+Each protocol provides an execution environment:
 
-**Certified Data:**
-- Integrity-verified data (ICP_ID, critical validations)
-- Network-enforced data integrity
+- **ICP**: Canister execution environment (tamperproof, serverless, network-enforced)
+- **Base/Optimism**: EVM execution environment (smart contract execution, gas-based)
+- **L2**: L2-specific execution environment (varies by L2 type)
 
-#### Authentication & Security
+### Protocol Adapter Contract
 
-**Internet Identity:**
-- ICP_ID canister wraps ICP's Internet Identity system
-- Decentralized identity without private key management
-- Principal-based authentication for all canister calls
-- Network-enforced authentication (tamperproof)
+Every protocol adapter must satisfy:
 
-**Security Model:**
-- Network-enforced tamperproof execution
-- Guaranteed uptime and unstoppable execution
-- No traditional attack vectors (DDoS, server compromise, etc.)
-- Certified data ensures integrity
-
-#### Technology Stack
-
-- **Languages**: Motoko (primary) or Rust (alternative)
-- **Network**: Internet Computer (ICP) mainnet
-- **Storage**: Stable memory for persistent state
-- **Authentication**: Internet Identity via ICP_ID canister
-- **Communication**: Inter-canister calls (A2A protocol)
-- **Multi-chain**: Chain Fusion for token operations across blockchains
-- **AI Integration**: Self-writing apps capability for VALET agent
-
-#### Key Advantages
-
-- **Tamperproof & Unstoppable**: Network-enforced security eliminates traditional attacks
-- **Serverless**: No server management required
-- **Sovereign Cloud**: Escape vendor lock-in
-- **Self-Writing Apps**: AI can generate and update apps on demand
-- **Chain Fusion**: Trustless multi-chain token operations
-
----
-
-### How It Works on Base (Ethereum L2)
-
-#### Deployment Architecture
-
-**Smart Contract-Based Deployment:**
-- Each agent deployed as smart contract(s) on Base
-- Contracts communicate via contract function calls (A2A protocol)
-- State stored in contract storage (gas-optimized)
-- EVM-compatible execution environment
-
-**Agent-to-Contract Mapping:**
-
-| Contract | Agents | Type | Description |
-|----------|--------|------|-------------|
-| **ValetContract** | VALET, PORTE | Main + Library | VALET (main contract) + PORTE (library/module) |
-| **DashboardContract** | DASHB, DASHC | Main + Library | DASHB (main contract) + DASHC (library/module) |
-| **ShopiContract** | SHOPI | Standalone | Shopping journey, personalization |
-| **MarktContract** | MARKT | Standalone | Core AMM, swaps (USDC ↔ PVT) |
-| **RidimContract** | RIDIM | Standalone | PVT redemption orchestration |
-| **PromoContract** | PROMO | Standalone | Influencer & affiliate management |
-| **FolioContract** | FOLIO | Standalone | PVT wallet management (ERC-721/1155) |
-| **PaymeContract** | PAYME | Standalone | Escrow handling, payment execution |
-| **DefimeContract** | DEFIME | Standalone | Yield management, DeFi integration |
-| **IdentityContract** | ICP_ID | Standalone | Identity verification (wallet-based) |
-| **PayoutContract** | PAYOUT | Standalone | Fund withdrawal (under consideration) |
-
-**Gas Optimization:**
-- Sub-agents (PORTE, DASHC) implemented as libraries to reduce gas costs
-- Packed structs and mappings for efficient storage
-- Batch operations where possible
-
-#### Communication (A2A via Contract Calls)
-
-**NANDA Protocol Implementation:**
-- A2A edges map to smart contract function calls
-- Calls are synchronous (EVM execution model)
-- All calls authenticated via wallet signatures (EIP-712)
-- Contract-level access control ensures message integrity
-- Events emitted for cross-contract communication
-
-**Example Flow:**
-```
-Python Model: SHOPI → VALET (query, campaign.list_active)
-    ↓
-Base: ShopiContract → ValetContract (function call)
-    ↓
-Function: queryCampaigns(filters, limit, offset)
-    ↓
-Storage: Query from contract storage (read-only)
-    ↓
-Response: Return data to ShopiContract
-    ↓
-Event: CampaignQuery event emitted (optional)
+```python
+class ProtocolAdapter:
+    def read_state(self, agent_id: str, query: dict) -> dict:
+        """Read state from agent deployment unit."""
+        pass
+    
+    def write_state(self, agent_id: str, operation: dict) -> dict:
+        """Write state to agent deployment unit."""
+        pass
+    
+    def authenticate(self, identity: dict) -> bool:
+        """Authenticate user/agent identity."""
+        pass
+    
+    def estimate_fee(self, operation: dict) -> float:
+        """Estimate operation cost."""
+        pass
+    
+    def confirm_event(self, event_id: str) -> dict:
+        """Confirm operation completion."""
+        pass
 ```
 
-#### State Storage
-
-**Contract Storage:**
-- Persistent storage for critical state (campaigns, transactions, ownership)
-- Stored in contract state variables
-- Gas-optimized storage patterns (packed structs, mappings)
-- Used for: campaign configs, transaction logs, PVT ownership, redemption records
-
-**Memory:**
-- Temporary storage (cleared after transaction)
-- Used for: Temporary calculations, query results
-- No persistent caching (recalculate on each call)
-
-**Storage Optimization:**
-- Packed structs to minimize storage slots
-- Mappings for efficient lookups
-- Events for off-chain indexing
-
-#### Authentication & Security
-
-**Wallet-Based Authentication:**
-- IdentityContract (or access control modifiers) handles authentication
-- Wallet signatures (EIP-712) for all contract calls
-- Address-based authorization (role-based access control)
-- Smart contract-enforced authentication
-
-**Security Model:**
-- Smart contract security (reentrancy guards, access control)
-- EVM execution guarantees
-- Base's L2 security (inherits Ethereum security)
-- Lower gas costs than Ethereum mainnet
-- Faster transaction finality
-
-#### Technology Stack
-
-- **Languages**: Solidity (primary) or Vyper (alternative)
-- **Network**: Base mainnet (Ethereum L2)
-- **Storage**: Contract storage (gas-optimized)
-- **Authentication**: Wallet signatures (EIP-712) via IdentityContract
-- **Communication**: Contract function calls (A2A protocol)
-- **Token Standards**: ERC-20 for PVTs, ERC-721/1155 for DPP NFTs
-- **Bridge Integration**: Base's native bridge for multi-chain operations
-
-#### Key Advantages
-
-- **Lower Gas Costs**: L2 benefits reduce transaction costs
-- **Faster Transactions**: Quick finality compared to Ethereum mainnet
-- **Ethereum Security**: Inherits Ethereum's security model
-- **EVM Compatibility**: Standard tooling and libraries
-- **Base Bridge**: Native bridge for cross-chain operations
-
----
-
-### How It Works on Optimism (Ethereum L2)
-
-#### Deployment Architecture
-
-**Smart Contract-Based Deployment:**
-- Similar to Base (Ethereum L2 with optimistic rollups)
-- Each agent deployed as smart contract(s) on Optimism
-- Contracts communicate via contract function calls (A2A protocol)
-- Optimistic rollup security model
-
-**Agent-to-Contract Mapping:**
-- Same structure as Base (see Base section above)
-- Contracts deployed on Optimism mainnet
-- Optimism-specific bridge for multi-chain operations
-
-#### Communication (A2A via Contract Calls)
-
-**NANDA Protocol Implementation:**
-- Same as Base: A2A edges map to smart contract function calls
-- Synchronous execution (EVM model)
-- Wallet-based authentication (EIP-712)
-- Contract-level access control
-
-#### State Storage
-
-**Contract Storage:**
-- Same as Base: Contract storage with gas optimization
-- Persistent state in contract variables
-- Events for off-chain indexing
-
-#### Authentication & Security
-
-**Wallet-Based Authentication:**
-- Same as Base: Wallet signatures (EIP-712)
-- Address-based authorization
-- Smart contract-enforced authentication
-
-**Security Model:**
-- Optimistic rollup security (faster finality, lower costs)
-- Ethereum security inheritance
-- Fault proofs for dispute resolution
-- Lower gas costs than Ethereum mainnet
-
-#### Technology Stack
-
-- **Languages**: Solidity (primary) or Vyper (alternative)
-- **Network**: Optimism mainnet (Ethereum L2)
-- **Storage**: Contract storage (gas-optimized)
-- **Authentication**: Wallet signatures (EIP-712) via IdentityContract
-- **Communication**: Contract function calls (A2A protocol)
-- **Token Standards**: ERC-20 for PVTs, ERC-721/1155 for DPP NFTs
-- **Bridge Integration**: Optimism's native bridge for cross-chain operations
-
-#### Key Advantages
-
-- **Optimistic Rollups**: Faster finality, lower costs, Ethereum security
-- **Fault Proofs**: Dispute resolution mechanism
-- **Ethereum Compatibility**: Full EVM compatibility
-- **Lower Gas Costs**: L2 benefits reduce transaction costs
-- **Optimism Bridge**: Native bridge for cross-chain operations
-
----
-
-### How It Works on General L2 (Any Ethereum-Compatible L2)
-
-#### Deployment Architecture
-
-**Smart Contract-Based Deployment:**
-- Applicable to any Ethereum-compatible L2 (Arbitrum, Polygon, zkSync, etc.)
-- Each agent deployed as smart contract(s) on chosen L2
-- Contracts communicate via contract function calls (A2A protocol)
-- L2-specific security and bridge mechanisms
-
-**Agent-to-Contract Mapping:**
-- Same structure as Base/Optimism (see Base section)
-- Contracts deployed on chosen L2 mainnet
-- L2-specific bridge for cross-chain operations
-
-#### Communication (A2A via Contract Calls)
-
-**NANDA Protocol Implementation:**
-- A2A edges map to contract function calls
-- L2-specific execution model (zk-rollup, optimistic rollup, or sidechain)
-- Wallet-based authentication (EIP-712 for EVM L2s)
-- Contract-level access control
-
-#### State Storage
-
-**Contract Storage:**
-- L2-specific storage mechanisms
-- Contract storage for EVM-compatible L2s
-- Gas-optimized patterns
-- Events for off-chain indexing
-
-#### Authentication & Security
-
-**Wallet-Based Authentication:**
-- Wallet signatures (EIP-712 for EVM L2s)
-- Address-based authorization
-- Smart contract-enforced authentication
-
-**Security Model:**
-- L2-specific security model (zk-proofs, optimistic rollups, sidechain security)
-- Inherits security from underlying chain (Ethereum for L2s)
-- L2-specific finality times and guarantees
-
-#### Technology Stack
-
-- **Languages**: Solidity (for EVM-compatible L2s) or L2-specific languages
-- **Network**: Any Ethereum-compatible L2 (Arbitrum, Polygon, zkSync, etc.)
-- **Storage**: L2-specific storage mechanisms
-- **Authentication**: L2-specific authentication (wallet-based for EVM L2s)
-- **Communication**: L2-specific communication mechanisms
-- **Token Standards**: ERC-20 for PVTs, ERC-721/1155 for DPP NFTs (EVM L2s)
-- **Bridge Integration**: L2-specific bridge mechanisms
-
-#### Key Advantages
-
-- **L2 Benefits**: Lower costs, faster transactions, scalability
-- **Ethereum Security**: Inherits security from Ethereum (for L2s)
-- **Flexibility**: Choose L2 based on specific needs (cost, speed, features)
-- **EVM Compatibility**: Standard tooling for EVM-compatible L2s
-- **Bridge Options**: Multiple bridge options for cross-chain operations
-
-#### L2-Specific Considerations
-
-**zk-Rollups (e.g., zkSync):**
-- Zero-knowledge proofs for security
-- Fast finality
-- Lower costs
-- May require different token standards
-
-**Optimistic Rollups (e.g., Arbitrum, Optimism):**
-- Faster finality than Ethereum
-- Lower costs
-- Ethereum security inheritance
-- Dispute resolution mechanisms
-
-**Sidechains (e.g., Polygon):**
-- Independent security model
-- Very low costs
-- Fast transactions
-- Bridge security considerations
+This contract ensures protocol-agnostic core logic can work with any protocol implementation.
 
 ---
 
@@ -1434,46 +939,7 @@ Event: CampaignQuery event emitted (optional)
   - `streamlit`: Interactive dashboard for testing
 
 **Target Phase (Protocol-Specific Deployment):**
-
-#### Option A: Internet Computer (ICP) Deployment
-- **Languages**: Motoko (primary) or Rust (alternative)
-- **Network**: Internet Computer (ICP) mainnet
-- **Deployment**: Each agent as ICP canister
-- **Storage**: Stable memory for persistent state
-- **Authentication**: Internet Identity via ICP_ID canister
-- **Communication**: Inter-canister calls (A2A protocol)
-- **Security**: Network-enforced tamperproof execution
-- **Multi-chain**: Chain Fusion for token operations across blockchains
-
-#### Option B: Base (Ethereum L2) Deployment
-- **Languages**: Solidity (primary) or Vyper (alternative)
-- **Network**: Base mainnet (Ethereum L2)
-- **Deployment**: Each agent as smart contract(s)
-- **Storage**: Contract storage (gas-optimized)
-- **Authentication**: Wallet signatures (EIP-712) via IdentityContract
-- **Communication**: Contract function calls (A2A protocol)
-- **Security**: Smart contract security (reentrancy guards, access control)
-- **Multi-chain**: Base bridge for cross-chain operations
-
-#### Option C: Optimism (Ethereum L2) Deployment
-- **Languages**: Solidity (primary) or Vyper (alternative)
-- **Network**: Optimism mainnet (Ethereum L2)
-- **Deployment**: Each agent as smart contract(s)
-- **Storage**: Contract storage (gas-optimized)
-- **Authentication**: Wallet signatures (EIP-712) via IdentityContract
-- **Communication**: Contract function calls (A2A protocol)
-- **Security**: Optimistic rollup security model
-- **Multi-chain**: Optimism bridge for cross-chain operations
-
-#### Option D: General L2 Deployment
-- **Languages**: Solidity (for EVM-compatible L2s) or L2-specific languages
-- **Network**: Any Ethereum-compatible L2 (Arbitrum, Polygon, zkSync, etc.)
-- **Deployment**: Each agent as smart contract(s)
-- **Storage**: L2-specific storage mechanisms
-- **Authentication**: L2-specific authentication (wallet-based for EVM L2s)
-- **Communication**: L2-specific communication mechanisms
-- **Security**: L2-specific security model (zk-proofs, optimistic rollups, etc.)
-- **Multi-chain**: L2-specific bridge mechanisms
+- See Appendices A-D for protocol-specific technology stacks
 
 ### Architecture Decisions
 
@@ -1488,36 +954,41 @@ Event: CampaignQuery event emitted (optional)
    - Ensures consistent message format across all protocols
    - Validates communication contracts before deployment
 
-3. **Multi-Protocol Deployment Strategy**: Support multiple blockchain protocols
+3. **Protocol Abstraction Layer**: Define capabilities, not implementations
+   - Protocol adapter interface ensures core logic works with any protocol
+   - Protocol-specific adapters implement interface for each supported protocol
+   - Core logic remains invariant across protocols
+
+4. **Multi-Protocol Deployment Strategy**: Support multiple blockchain protocols
    - **ICP**: Canister-based deployment (isolation, stable memory, network-enforced security)
    - **Base/Optimism/L2**: Smart contract deployment (gas-optimized, wallet-based auth)
    - Same agent logic, different deployment mechanisms
    - Protocol-specific optimizations (libraries for L2s, sub-agents for ICP)
 
-4. **Protocol-Specific Authentication**: Decentralized authentication per protocol
+5. **Protocol-Specific Authentication**: Decentralized authentication per protocol
    - **ICP**: Internet Identity (no private keys, network-enforced)
    - **Base/Optimism/L2**: Wallet signatures (EIP-712, user-controlled keys)
    - Same authorization logic, different authentication mechanisms
 
-5. **Mock Data Testing**: Test logic without external dependencies (protocol-agnostic)
+6. **Mock Data Testing**: Test logic without external dependencies (protocol-agnostic)
    - Validates business rules before any protocol deployment
    - Tests state transitions and agent coordination
    - Scoring system for quantitative validation
    - All tests are protocol-agnostic
 
-6. **Graph Validation**: Ensure network integrity before deployment (protocol-agnostic)
+7. **Graph Validation**: Ensure network integrity before deployment (protocol-agnostic)
    - Validates agent communication patterns (protocol-agnostic)
    - Ensures all agents are reachable
    - Prevents deployment of broken agent networks on any protocol
 
 ### Known Limitations
 
-1. **Incomplete NANDA Compliance**: 35 edges have unspecified intents (must be specified before ICP deployment)
+1. **Incomplete NANDA Compliance**: 35 edges have unspecified intents (must be specified before protocol deployment)
 2. **Mock Data Only**: No real wallet/blockchain integration (Python model phase)
-3. **Python Model Only**: Not actual ICP canister deployment (next phase)
-4. **Limited Error Handling**: Some edge cases may not be fully handled (to be addressed in canister implementation)
-5. **No Performance Testing**: Focus is on logic validation, not canister performance
-6. **No Chain Fusion Implementation**: Multi-chain token operations not yet implemented (Python model phase)
+3. **Python Model Only**: Not actual protocol deployment (next phase)
+4. **Limited Error Handling**: Some edge cases may not be fully handled (to be addressed in protocol implementation)
+5. **No Performance Testing**: Focus is on logic validation, not protocol performance
+6. **No Multi-Chain Implementation**: Multi-chain token operations not yet implemented (Python model phase)
 7. **No Self-Writing AI Integration**: VALET's AI capabilities are modeled but not connected to actual AI services
 
 ### Protocol Deployment Readiness
@@ -1531,30 +1002,416 @@ Event: CampaignQuery event emitted (optional)
 - ✅ Graph integrity validated (all agents reachable - protocol-agnostic)
 
 **Before Protocol-Specific Deployment:**
-
-**For ICP Deployment:**
 - ⚠️ Specify all NANDA intents (35 edges need specification)
-- ⚠️ Implement canisters in Motoko/Rust
-- ⚠️ Integrate Internet Identity (ICP_ID canister)
-- ⚠️ Implement stable memory storage
-- ⚠️ Add Chain Fusion for multi-chain operations
+- ⚠️ Implement protocol adapter for target protocol
+- ⚠️ Implement protocol-specific deployment units (canisters/contracts)
+- ⚠️ Integrate protocol-native authentication
+- ⚠️ Implement protocol-native storage
+- ⚠️ Add bridge integration for multi-chain operations (if needed)
 - ⚠️ Connect VALET to AI services for self-writing capabilities
-
-**For Base/Optimism/L2 Deployment:**
-- ⚠️ Specify all NANDA intents (35 edges need specification)
-- ⚠️ Implement smart contracts in Solidity/Vyper
-- ⚠️ Integrate wallet authentication (EIP-712 signatures)
-- ⚠️ Implement contract storage (gas-optimized)
-- ⚠️ Add bridge integration for multi-chain operations
-- ⚠️ Implement access control patterns (RBAC, modifiers)
-- ⚠️ Security audits (reentrancy, access control, gas optimization)
-- ⚠️ Connect VALET to AI services for self-writing capabilities
+- ⚠️ Protocol-specific security audits
 
 ---
 
-## Appendix
+## Appendices
 
-### A. Test Scenarios Summary
+### Appendix A: ICP Implementation
+
+#### Deployment Architecture
+
+**Canister-Based Deployment:**
+- Each agent deployed as an ICP canister (or shared canister for sub-agents)
+- Canisters are tamperproof, unstoppable, and serverless by design
+- Network-enforced security and resilience
+- Canister upgrades preserve state in stable memory
+
+**Agent-to-Canister Mapping:**
+
+| Canister | Agents | Type | Description |
+|----------|--------|------|-------------|
+| **VALET Canister** | VALET, PORTE | Application | VALET (main) + PORTE (sub-agent) share canister |
+| **DASHB Canister** | DASHB, DASHC | Data | DASHB (main) + DASHC (sub-agent) share canister |
+| **SHOPI Canister** | SHOPI | Application | Shopping journey, personalization |
+| **MARKT Canister** | MARKT | Application | Core AMM, swaps (USDC ↔ PVT) |
+| **RIDIM Canister** | RIDIM | Application | PVT redemption orchestration |
+| **PROMO Canister** | PROMO | Application | Influencer & affiliate management |
+| **FOLIO Canister** | FOLIO | Application | PVT wallet management |
+| **PAYME Canister** | PAYME | Finance | Escrow handling, payment execution |
+| **DEFIME Canister** | DEFIME | Finance | Yield management, DeFi integration |
+| **ICP_ID Canister** | ICP_ID | Identity | Internet Identity integration |
+| **PAYOUT Canister** | PAYOUT | Finance | Fund withdrawal (under consideration) |
+
+**Subnet Distribution:**
+- **Brand Services Subnet**: VALET (with PORTE), DASHB (with DASHC), PROMO canisters
+- **Shopper Services Subnet**: SHOPI, FOLIO canisters
+- **Finance Services Subnet**: PAYME, DEFIME, PAYOUT canisters (high-security)
+- **Marketplace Subnet**: MARKT canister
+- **Redemption Subnet**: RIDIM canister
+- **Identity Layer**: ICP_ID canister (Internet Identity integration)
+- **External Integration**: MIRO/BRAT (external agent, integration method TBD)
+
+#### Communication (A2A via Inter-Canister Calls)
+
+**NANDA Protocol Implementation:**
+- A2A edges map to inter-canister calls on ICP
+- Calls are async and non-atomic (require state machines)
+- All calls authenticated via Internet Identity (ICP_ID canister)
+- Network-enforced message delivery and execution
+- Certified data ensures message integrity
+
+**Example Flow:**
+```
+Python Model: SHOPI → VALET (query, campaign.list_active)
+    ↓
+ICP: shopi-canister → valet-canister (inter-canister call)
+    ↓
+Method: query_campaigns(filters, limit, offset)
+    ↓
+Storage: Query from stable memory (read-only)
+    ↓
+Response: Certified data returned to shopi-canister
+```
+
+#### State Storage
+
+**Stable Memory:**
+- Persistent storage for critical state (campaigns, transactions, ownership)
+- Survives canister upgrades
+- Used for: campaign configs, transaction logs, PVT ownership, redemption records
+
+**Heap Memory:**
+- Temporary storage (cleared on upgrade)
+- Used for: AI model caching (VALET), temporary calculations, query results
+
+**Certified Data:**
+- Integrity-verified data (ICP_ID, critical validations)
+- Network-enforced data integrity
+
+#### Authentication & Security
+
+**Internet Identity:**
+- ICP_ID canister wraps ICP's Internet Identity system
+- Decentralized identity without private key management
+- Principal-based authentication for all canister calls
+- Network-enforced authentication (tamperproof)
+
+**Security Model:**
+- Network-enforced tamperproof execution
+- Guaranteed uptime and unstoppable execution
+- No traditional attack vectors (DDoS, server compromise, etc.)
+- Certified data ensures integrity
+
+#### Technology Stack
+
+- **Languages**: Motoko (primary) or Rust (alternative)
+- **Network**: Internet Computer (ICP) mainnet
+- **Storage**: Stable memory for persistent state
+- **Authentication**: Internet Identity via ICP_ID canister
+- **Communication**: Inter-canister calls (A2A protocol)
+- **Multi-chain**: Chain Fusion for token operations across blockchains
+- **AI Integration**: Self-writing apps capability for VALET agent
+
+#### Key Advantages
+
+- **Tamperproof & Unstoppable**: Network-enforced security eliminates traditional attacks
+- **Serverless**: No server management required
+- **Sovereign Cloud**: Escape vendor lock-in
+- **Self-Writing Apps**: AI can generate and update apps on demand
+- **Chain Fusion**: Trustless multi-chain token operations
+
+#### Known Tradeoffs
+
+- **Async Calls**: Inter-canister calls are async, requiring state machines for multi-step flows
+- **Cycle Costs**: Canister operations consume cycles (ICP's resource model)
+- **Internet Identity Dependency**: Requires Internet Identity for authentication
+- **Learning Curve**: Motoko/Rust development requires protocol-specific knowledge
+
+---
+
+### Appendix B: Base Implementation
+
+#### Deployment Architecture
+
+**Smart Contract-Based Deployment:**
+- Each agent deployed as smart contract(s) on Base
+- Contracts communicate via contract function calls (A2A protocol)
+- State stored in contract storage (gas-optimized)
+- EVM-compatible execution environment
+
+**Agent-to-Contract Mapping:**
+
+| Contract | Agents | Type | Description |
+|----------|--------|------|-------------|
+| **ValetContract** | VALET, PORTE | Main + Library | VALET (main contract) + PORTE (library/module) |
+| **DashboardContract** | DASHB, DASHC | Main + Library | DASHB (main contract) + DASHC (library/module) |
+| **ShopiContract** | SHOPI | Standalone | Shopping journey, personalization |
+| **MarktContract** | MARKT | Standalone | Core AMM, swaps (USDC ↔ PVT) |
+| **RidimContract** | RIDIM | Standalone | PVT redemption orchestration |
+| **PromoContract** | PROMO | Standalone | Influencer & affiliate management |
+| **FolioContract** | FOLIO | Standalone | PVT wallet management (ERC-721/1155) |
+| **PaymeContract** | PAYME | Standalone | Escrow handling, payment execution |
+| **DefimeContract** | DEFIME | Standalone | Yield management, DeFi integration |
+| **IdentityContract** | ICP_ID | Standalone | Identity verification (wallet-based) |
+| **PayoutContract** | PAYOUT | Standalone | Fund withdrawal (under consideration) |
+
+**Gas Optimization:**
+- Sub-agents (PORTE, DASHC) implemented as libraries to reduce gas costs
+- Packed structs and mappings for efficient storage
+- Batch operations where possible
+
+#### Communication (A2A via Contract Calls)
+
+**NANDA Protocol Implementation:**
+- A2A edges map to smart contract function calls
+- Calls are synchronous (EVM execution model)
+- All calls authenticated via wallet signatures (EIP-712)
+- Contract-level access control ensures message integrity
+- Events emitted for cross-contract communication
+
+**Example Flow:**
+```
+Python Model: SHOPI → VALET (query, campaign.list_active)
+    ↓
+Base: ShopiContract → ValetContract (function call)
+    ↓
+Function: queryCampaigns(filters, limit, offset)
+    ↓
+Storage: Query from contract storage (read-only)
+    ↓
+Response: Return data to ShopiContract
+    ↓
+Event: CampaignQuery event emitted (optional)
+```
+
+#### State Storage
+
+**Contract Storage:**
+- Persistent storage for critical state (campaigns, transactions, ownership)
+- Stored in contract state variables
+- Gas-optimized storage patterns (packed structs, mappings)
+- Used for: campaign configs, transaction logs, PVT ownership, redemption records
+
+**Memory:**
+- Temporary storage (cleared after transaction)
+- Used for: Temporary calculations, query results
+- No persistent caching (recalculate on each call)
+
+**Storage Optimization:**
+- Packed structs to minimize storage slots
+- Mappings for efficient lookups
+- Events for off-chain indexing
+
+#### Authentication & Security
+
+**Wallet-Based Authentication:**
+- IdentityContract (or access control modifiers) handles authentication
+- Wallet signatures (EIP-712) for all contract calls
+- Address-based authorization (role-based access control)
+- Smart contract-enforced authentication
+
+**Security Model:**
+- Smart contract security (reentrancy guards, access control)
+- EVM execution guarantees
+- Base's L2 security (inherits Ethereum security)
+- Lower gas costs than Ethereum mainnet
+- Faster transaction finality
+
+#### Technology Stack
+
+- **Languages**: Solidity (primary) or Vyper (alternative)
+- **Network**: Base mainnet (Ethereum L2)
+- **Storage**: Contract storage (gas-optimized)
+- **Authentication**: Wallet signatures (EIP-712) via IdentityContract
+- **Communication**: Contract function calls (A2A protocol)
+- **Token Standards**: ERC-20 for PVTs, ERC-721/1155 for DPP NFTs
+- **Bridge Integration**: Base's native bridge for multi-chain operations
+
+#### Key Advantages
+
+- **Lower Gas Costs**: L2 benefits reduce transaction costs
+- **Faster Transactions**: Quick finality compared to Ethereum mainnet
+- **Ethereum Security**: Inherits Ethereum's security model
+- **EVM Compatibility**: Standard tooling and libraries
+- **Base Bridge**: Native bridge for cross-chain operations
+
+#### Known Tradeoffs
+
+- **Gas Costs**: Still requires gas fees (though lower than Ethereum mainnet)
+- **Synchronous Calls**: Contract calls are synchronous, limiting async patterns
+- **Storage Costs**: Contract storage is expensive (gas-optimization critical)
+- **Upgrade Complexity**: Contract upgrades require proxy patterns or migration
+- **Wallet Dependency**: Requires users to manage private keys
+
+---
+
+### Appendix C: Optimism Implementation
+
+#### Deployment Architecture
+
+**Smart Contract-Based Deployment:**
+- Similar to Base (Ethereum L2 with optimistic rollups)
+- Each agent deployed as smart contract(s) on Optimism
+- Contracts communicate via contract function calls (A2A protocol)
+- Optimistic rollup security model
+
+**Agent-to-Contract Mapping:**
+- Same structure as Base (see Appendix B)
+- Contracts deployed on Optimism mainnet
+- Optimism-specific bridge for multi-chain operations
+
+#### Communication (A2A via Contract Calls)
+
+**NANDA Protocol Implementation:**
+- Same as Base: A2A edges map to smart contract function calls
+- Synchronous execution (EVM model)
+- Wallet-based authentication (EIP-712)
+- Contract-level access control
+
+#### State Storage
+
+**Contract Storage:**
+- Same as Base: Contract storage with gas optimization
+- Persistent state in contract variables
+- Events for off-chain indexing
+
+#### Authentication & Security
+
+**Wallet-Based Authentication:**
+- Same as Base: Wallet signatures (EIP-712)
+- Address-based authorization
+- Smart contract-enforced authentication
+
+**Security Model:**
+- Optimistic rollup security (faster finality, lower costs)
+- Ethereum security inheritance
+- Fault proofs for dispute resolution
+- Lower gas costs than Ethereum mainnet
+
+#### Technology Stack
+
+- **Languages**: Solidity (primary) or Vyper (alternative)
+- **Network**: Optimism mainnet (Ethereum L2)
+- **Storage**: Contract storage (gas-optimized)
+- **Authentication**: Wallet signatures (EIP-712) via IdentityContract
+- **Communication**: Contract function calls (A2A protocol)
+- **Token Standards**: ERC-20 for PVTs, ERC-721/1155 for DPP NFTs
+- **Bridge Integration**: Optimism's native bridge for cross-chain operations
+
+#### Key Advantages
+
+- **Optimistic Rollups**: Faster finality, lower costs, Ethereum security
+- **Fault Proofs**: Dispute resolution mechanism
+- **Ethereum Compatibility**: Full EVM compatibility
+- **Lower Gas Costs**: L2 benefits reduce transaction costs
+- **Optimism Bridge**: Native bridge for cross-chain operations
+
+#### Known Tradeoffs
+
+- **Gas Costs**: Still requires gas fees (though lower than Ethereum mainnet)
+- **Synchronous Calls**: Contract calls are synchronous, limiting async patterns
+- **Storage Costs**: Contract storage is expensive (gas-optimization critical)
+- **Upgrade Complexity**: Contract upgrades require proxy patterns or migration
+- **Wallet Dependency**: Requires users to manage private keys
+- **Fault Proof Window**: Optimistic rollups have a challenge period for disputes
+
+---
+
+### Appendix D: General L2 Implementation
+
+#### Deployment Architecture
+
+**Smart Contract-Based Deployment:**
+- Applicable to any Ethereum-compatible L2 (Arbitrum, Polygon, zkSync, etc.)
+- Each agent deployed as smart contract(s) on chosen L2
+- Contracts communicate via contract function calls (A2A protocol)
+- L2-specific security and bridge mechanisms
+
+**Agent-to-Contract Mapping:**
+- Same structure as Base/Optimism (see Appendix B)
+- Contracts deployed on chosen L2 mainnet
+- L2-specific bridge for cross-chain operations
+
+#### Communication (A2A via Contract Calls)
+
+**NANDA Protocol Implementation:**
+- A2A edges map to contract function calls
+- L2-specific execution model (zk-rollup, optimistic rollup, or sidechain)
+- Wallet-based authentication (EIP-712 for EVM L2s)
+- Contract-level access control
+
+#### State Storage
+
+**Contract Storage:**
+- L2-specific storage mechanisms
+- Contract storage for EVM-compatible L2s
+- Gas-optimized patterns
+- Events for off-chain indexing
+
+#### Authentication & Security
+
+**Wallet-Based Authentication:**
+- Wallet signatures (EIP-712 for EVM L2s)
+- Address-based authorization
+- Smart contract-enforced authentication
+
+**Security Model:**
+- L2-specific security model (zk-proofs, optimistic rollups, sidechain security)
+- Inherits security from underlying chain (Ethereum for L2s)
+- L2-specific finality times and guarantees
+
+#### Technology Stack
+
+- **Languages**: Solidity (for EVM-compatible L2s) or L2-specific languages
+- **Network**: Any Ethereum-compatible L2 (Arbitrum, Polygon, zkSync, etc.)
+- **Storage**: L2-specific storage mechanisms
+- **Authentication**: L2-specific authentication (wallet-based for EVM L2s)
+- **Communication**: L2-specific communication mechanisms
+- **Token Standards**: ERC-20 for PVTs, ERC-721/1155 for DPP NFTs (EVM L2s)
+- **Bridge Integration**: L2-specific bridge mechanisms
+
+#### Key Advantages
+
+- **L2 Benefits**: Lower costs, faster transactions, scalability
+- **Ethereum Security**: Inherits security from Ethereum (for L2s)
+- **Flexibility**: Choose L2 based on specific needs (cost, speed, features)
+- **EVM Compatibility**: Standard tooling for EVM-compatible L2s
+- **Bridge Options**: Multiple bridge options for cross-chain operations
+
+#### Known Tradeoffs
+
+- **L2-Specific Considerations**: Each L2 type has unique tradeoffs (see below)
+- **Gas Costs**: Varies by L2 (some have very low costs, others moderate)
+- **Synchronous Calls**: Contract calls are synchronous for EVM L2s
+- **Storage Costs**: Contract storage costs vary by L2
+- **Upgrade Complexity**: Contract upgrades require proxy patterns or migration
+- **Wallet Dependency**: Requires users to manage private keys
+
+#### L2-Specific Considerations
+
+**zk-Rollups (e.g., zkSync):**
+- Zero-knowledge proofs for security
+- Fast finality
+- Lower costs
+- May require different token standards
+- **Tradeoffs**: More complex development, may have different execution model
+
+**Optimistic Rollups (e.g., Arbitrum, Optimism):**
+- Faster finality than Ethereum
+- Lower costs
+- Ethereum security inheritance
+- Dispute resolution mechanisms
+- **Tradeoffs**: Challenge period for disputes, longer finality than zk-rollups
+
+**Sidechains (e.g., Polygon):**
+- Independent security model
+- Very low costs
+- Fast transactions
+- Bridge security considerations
+- **Tradeoffs**: Less security guarantees than rollups, bridge risks
+
+---
+
+### Appendix E: Test Scenarios Summary
 
 **Happy Path (3):**
 - campaign_creation
@@ -1578,36 +1435,36 @@ Event: CampaignQuery event emitted (optional)
 - immediate_redemption
 - concurrent_redemption
 
-### B. Agent Roles and Canister Mapping
+### Appendix F: Agent Roles and Deployment Mapping
 
 **Brand-Facing:**
-- VALET (main agent, own canister with PORTE sub-agent)
-- PORTE (sub-agent, shares VALET canister)
-- DASHB (main agent, own canister with DASHC sub-agent)
-- DASHC (sub-agent, shares DASHB canister)
-- PROMO (own canister)
+- VALET (main agent, shares deployment unit with PORTE sub-agent)
+- PORTE (sub-agent, shares VALET deployment unit)
+- DASHB (main agent, shares deployment unit with DASHC sub-agent)
+- DASHC (sub-agent, shares DASHB deployment unit)
+- PROMO (own deployment unit)
 
 **Shopper-Facing:**
-- SHOPI (own canister)
-- FOLIO (own canister)
-- RIDIM (own canister)
+- SHOPI (own deployment unit)
+- FOLIO (own deployment unit)
+- RIDIM (own deployment unit)
 - MIRO/BRAT (external, integration TBD)
 
 **Finance:**
-- MARKT (own canister)
-- PAYME (own canister)
-- DEFIME (own canister)
-- PAYOUT (under consideration, own canister if implemented)
+- MARKT (own deployment unit)
+- PAYME (own deployment unit)
+- DEFIME (own deployment unit)
+- PAYOUT (under consideration, own deployment unit if implemented)
 
 **Identity:**
-- ICP_ID (own canister)
+- ICP_ID (own deployment unit, protocol-specific implementation)
 
-**Canister Summary:**
-- 10 confirmed canisters (VALET+PORTE, DASHB+DASHC, SHOPI, MARKT, RIDIM, PROMO, FOLIO, PAYME, DEFIME, ICP_ID)
-- 1 under consideration (PAYOUT)
-- 1 external integration (MIRO/BRAT)
+**Deployment Summary:**
+- Protocol-specific deployment unit mapping (see protocol-specific appendices)
+- Sub-agent relationships (shared deployment units)
+- External integrations
 
-### C. State Change Matrix
+### Appendix G: State Change Matrix
 
 | Agent | State-Changing | Non-State-Changing |
 |-------|----------------|---------------------|
