@@ -84,7 +84,7 @@ def ramm_agents() -> List[Agent]:
                 "Product Page Generator",
                 "Bonding Curve Selector",
             ],
-            a2a_outbound=["PROMO", "PAYME", "FOLIO"],
+            a2a_outbound=["PROMO", "PAYME", "FOLIO", "LOYLT"],
         ),
         Agent(
             code="PORTE",
@@ -209,7 +209,7 @@ def ramm_agents() -> List[Agent]:
                 "Event Log (on-chain)",
                 "Marketplace Gateway",
             ],
-            a2a_outbound=["PAYME", "RIDIM", "PROMO"],
+            a2a_outbound=["PAYME", "RIDIM", "PROMO", "LOYLT"],
         ),
         Agent(
             code="PROMO",
@@ -227,7 +227,7 @@ def ramm_agents() -> List[Agent]:
                 "Reward Tier Logic",
                 "AI Content Generator",
             ],
-            a2a_outbound=["VALET", "PAYME", "SHOPI"],
+            a2a_outbound=["VALET", "PAYME", "SHOPI", "LOYLT"],
         ),
         Agent(
             code="PAYME",
@@ -324,6 +324,29 @@ def ramm_agents() -> List[Agent]:
             ],
             a2a_outbound=["SHOPI"],
         ),
+        Agent(
+            code="LOYLT",
+            name="LOYLT – Loyalty & Rewards Manager",
+            role=AgentRole.BRAND,
+            kind=AgentKind.CANISTER,
+            description=(
+                "Manages brand loyalty programs within the RAMM.AI ecosystem. "
+                "Oversees loyalty tokens issued by brands as part of campaigns, enabling users to earn, "
+                "store, redeem, and optionally trade these tokens. Loyalty tokens may be distributed "
+                "alongside campaign rewards (e.g., PVT + DPP + brand-specific loyalty tokens) and can "
+                "function similarly to airline miles—usable as partial payment for future brand campaigns, "
+                "perks, or redemptions. Where permitted, loyalty tokens may also be swapped on secondary markets."
+            ),
+            interacts_with=["Brand Manager", "Shopper"],
+            tools=[
+                "Loyalty Token Registry (brand-scoped)",
+                "Earn & Burn Rules Engine",
+                "Reward Accrual & Balance Tracker",
+                "Secondary Market Enablement Hooks",
+                "Analytics & Loyalty Performance Signals",
+            ],
+            a2a_outbound=["MARKT", "PAYME", "DASHB"],
+        ),
     ]
 
 
@@ -352,6 +375,12 @@ def ramm_edges() -> List[A2AEdge]:
         ("MARKT", "DASHB"): ("event", "market.trade.logged", "{campaignId, tradeId, wallet}"),
         ("PAYME", "DEFIME"): ("command", "defi.route.locked_funds", "{campaignId, amount, strategy}"),
         ("PAYOUT", "PAYME"): ("command", "payme.disburse", "{campaignId, to, amount}"),
+        ("VALET", "LOYLT"): ("notify", "loyalty.program.configure", "{campaignId, brandId, loyaltyRules, earnRates, redemptionOptions}"),
+        ("FOLIO", "LOYLT"): ("event", "loyalty.purchase.event", "{wallet, campaignId, purchaseAmount, pvtCount}"),
+        ("PROMO", "LOYLT"): ("event", "loyalty.promotion.event", "{wallet, campaignId, promotionType, rewardAmount}"),
+        ("LOYLT", "MARKT"): ("request", "loyalty.swap.enable", "{brandId, loyaltyTokenId, swapRules}"),
+        ("LOYLT", "PAYME"): ("command", "loyalty.partial_payment", "{wallet, campaignId, loyaltyTokenAmount, usdcAmount}"),
+        ("LOYLT", "DASHB"): ("event", "loyalty.metrics.updated", "{brandId, campaignId, metrics, state}"),
     }
 
     for agent in ramm_agents():
@@ -372,7 +401,7 @@ def ramm_edges() -> List[A2AEdge]:
 
     # Explicit auth edges (everyone calls ICP_ID) so the graph is reachable and realistic.
     # This models: "every call is authenticated/authorized via ICP_ID layer".
-    auth_sources = ["VALET", "SHOPI", "FOLIO", "PAYME", "PROMO", "MARKT", "RIDIM", "PORTE", "DASHB", "DASHC", "PAYOUT"]
+    auth_sources = ["VALET", "SHOPI", "FOLIO", "PAYME", "PROMO", "MARKT", "RIDIM", "PORTE", "DASHB", "DASHC", "PAYOUT", "LOYLT"]
     for src in auth_sources:
         if src != "ICP_ID":
             edges.append(

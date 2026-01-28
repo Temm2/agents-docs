@@ -175,6 +175,18 @@ def simulate_scenario(scenario: TestScenario) -> tuple[Timeline, TestScore]:
         actual_a2a_calls.add(("VALET", "DASHB"))
         score.add_check("VALET → DASHB state update", True, 2)
 
+        # VALET configures LOYLT loyalty program
+        timeline.add(
+            AgentEvent(
+                agent_code="VALET",
+                kind=EventKind.A2A_CALL,
+                summary="VALET configures LOYLT loyalty program for campaign",
+                details={"target": "LOYLT"},
+            )
+        )
+        actual_a2a_calls.add(("VALET", "LOYLT"))
+        score.add_check("VALET → LOYLT loyalty program config", True, 2)
+
     elif scenario.name == "purchase_flow":
         # SHOPI queries VALET for active campaigns
         timeline.add(
@@ -246,6 +258,18 @@ def simulate_scenario(scenario: TestScenario) -> tuple[Timeline, TestScore]:
         )
         actual_state_transitions.setdefault("FOLIO", []).append(AgentPhase.ACTIVE)
         score.add_check("FOLIO mints PVT", True, 3)
+
+        # FOLIO notifies LOYLT of purchase event
+        timeline.add(
+            AgentEvent(
+                agent_code="FOLIO",
+                kind=EventKind.A2A_CALL,
+                summary="FOLIO notifies LOYLT of purchase event",
+                details={"target": "LOYLT"},
+            )
+        )
+        actual_a2a_calls.add(("FOLIO", "LOYLT"))
+        score.add_check("FOLIO → LOYLT purchase event", True, 2)
 
         # PAYME settles
         timeline.add(
@@ -801,7 +825,7 @@ def get_test_scenarios() -> List[TestScenario]:
             name="campaign_creation",
             description="VALET creates a new SMART CAMPAIGN and notifies PROMO/DASHB",
             mock_data={"campaign": campaign1},
-            expected_a2a_calls=[("VALET", "PROMO"), ("VALET", "DASHB")],
+            expected_a2a_calls=[("VALET", "PROMO"), ("VALET", "DASHB"), ("VALET", "LOYLT")],
             expected_state_transitions={"VALET": [AgentPhase.ACTIVE]},
             expected_events=["campaign", "VALET", "PROMO"],
             min_score_threshold=80.0,
@@ -810,7 +834,7 @@ def get_test_scenarios() -> List[TestScenario]:
             name="purchase_flow",
             description="SHOPI drives a purchase: MARKT swap → PAYME escrow → FOLIO PVT mint",
             mock_data={"campaign": campaign1, "wallet": wallet1},
-            expected_a2a_calls=[("SHOPI", "VALET"), ("SHOPI", "MARKT"), ("SHOPI", "PAYME"), ("SHOPI", "FOLIO")],
+            expected_a2a_calls=[("SHOPI", "VALET"), ("SHOPI", "MARKT"), ("SHOPI", "PAYME"), ("SHOPI", "FOLIO"), ("FOLIO", "LOYLT")],
             expected_state_transitions={"FOLIO": [AgentPhase.ACTIVE], "PAYME": [AgentPhase.SETTLING]},
             expected_events=["SHOPI", "MARKT", "PAYME", "FOLIO", "PVT"],
             min_score_threshold=85.0,

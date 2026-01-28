@@ -41,6 +41,28 @@ The system is implemented as a Python modeling framework that maps conceptually 
 
 The Python framework focuses on agent behavior, state transitions, and decision flows, providing a testable model before protocol-specific deployment.
 
+### Native Token: $RAMM
+
+**$RAMM** is the native utility token of the RAMM Agents ecosystem, deployed on Base. It serves as a primary medium of exchange for transactions across the platform.
+
+**Supported Currencies:**
+- **$RAMM**: Native utility token (primary)
+- **USDC**: USD Coin (Base protocol native)
+- **USDT**: Tether (stablecoin)
+- **Fiat**: Traditional currency support (via payment processors)
+
+**$RAMM Usage:**
+- **PAYME**: Can process payments in fiat, stablecoins (USDC/USDT), or $RAMM
+- **PAYOUT**: Can disburse funds to brands in fiat, stablecoins (USDC/USDT), or $RAMM
+- **DEFIME**: Can generate yield in $RAMM (in addition to other assets)
+- **MARKT**: AMM supports swaps involving $RAMM, USDC, USDT, and PVTs
+- **LOYLT**: Loyalty tokens can be redeemed for $RAMM or used for partial payments
+
+**Token Standards:**
+- **Base Deployment**: ERC-20 standard for $RAMM, USDC, USDT
+- **PVTs**: ERC-20 for Product Value Tokens
+- **DPP NFTs**: ERC-721/1155 for Digital Product Passports
+
 ---
 
 ## Problem Statement
@@ -143,7 +165,7 @@ A decentralized agent-based system deployable across multiple blockchain protoco
 
 ### FR1: Agent Network Architecture (Protocol-Agnostic)
 
-**Requirement:** The system must support 14 distinct agents with defined roles and responsibilities. The agent logic is protocol-agnostic, but deployment architecture varies by protocol (see Protocol Abstraction Layer and Appendices).
+**Requirement:** The system must support 15 distinct agents with defined roles and responsibilities. The agent logic is protocol-agnostic, but deployment architecture varies by protocol (see Protocol Abstraction Layer and Appendices).
 
 **Protocol-Agnostic Agent Definitions:**
 
@@ -153,15 +175,23 @@ A decentralized agent-based system deployable across multiple blockchain protoco
 - **DASHB**: Brand dashboard, campaign analytics, portfolio view (main agent)
 - **DASHC**: Shopper analytics, engagement metrics (DASHB sub-agent)
 - **SHOPI**: Shopping journey, personalization, product recommendations
-- **MARKT**: Core AMM, manages swaps (USDC ↔ PVT), liquidity tracking
+- **MARKT**: Core AMM, manages swaps ($RAMM/USDC/USDT ↔ PVT), liquidity tracking
 - **RIDIM**: PVT redemption orchestration, DPP minting coordination
 - **PROMO**: Influencer & affiliate management, attribution logic
 - **FOLIO**: PVT wallet management, redemption, gifting, reselling
-- **PAYME**: Escrow handling, payment execution, reward payouts
-- **DEFIME**: Yield management, DeFi integration
+- **PAYME**: Escrow handling, payment execution, reward payouts (supports fiat, USDC, USDT, $RAMM)
+- **DEFIME**: Yield management, DeFi integration (can generate yield in $RAMM and other assets)
+- **LOYLT**: Loyalty & Rewards Manager, manages brand loyalty programs and loyalty tokens
+  - Receives loyalty program configuration from VALET during campaign setup
+  - Defines loyalty token rules (earn rates, redemption options, transferability)
+  - Listens to purchase, promotion, and redemption events from FOLIO and PROMO
+  - Issues or updates loyalty token balances for shoppers
+  - Optionally enables swaps or secondary usage via MARKT
+  - Coordinates partial-payment or reward redemptions with PAYME
+  - Emits loyalty metrics and state updates to DASHB for brand visibility
 - **ICP_ID**: Identity and authentication layer (protocol-specific implementation)
 - **MIRO/BRAT**: Visual feedback agent for shoppers (external to marketplace, integration TBD)
-- **PAYOUT**: Fund withdrawal and settlement (under consideration)
+- **PAYOUT**: Fund withdrawal and settlement (can disburse in fiat, USDC, USDT, or $RAMM)
 
 **Sub-Agent Architecture:**
 - **PORTE as VALET Sub-Agent**: PORTE shares deployment unit with VALET (canister for ICP, library for L2s)
@@ -237,6 +267,8 @@ A decentralized agent-based system deployable across multiple blockchain protoco
 - DPP mint (PORTE: IDLE → COMPLETED)
 - Fund disbursement (PAYOUT: IDLE → SETTLING)
 - Redemption (RIDIM: IDLE → COMPLETED)
+- Loyalty token issuance/update (LOYLT: IDLE → ACTIVE)
+- Loyalty token redemption (LOYLT: ACTIVE → SETTLING)
 
 **Non-State-Changing Operations:**
 - Campaign queries (read-only)
@@ -263,6 +295,7 @@ A decentralized agent-based system deployable across multiple blockchain protoco
 - Fund disbursement (PAYOUT/PAYME)
 - DPP minting (PORTE)
 - Campaign activation (VALET)
+- Loyalty token issuance/redemption (LOYLT)
 
 **Validation:** Security test scenarios verify unauthorized commands are rejected. Python model validates authentication logic before protocol deployment.
 
@@ -276,18 +309,20 @@ A decentralized agent-based system deployable across multiple blockchain protoco
 1. Brand Manager → VALET: Campaign configuration
 2. VALET validates configuration
 3. VALET → PROMO: Notify campaign created
-4. VALET → DASHB: State update
-5. VALET transitions to ACTIVE
+4. VALET → LOYLT: Configure loyalty program (earn rates, redemption options, transferability)
+5. VALET → DASHB: State update
+6. VALET transitions to ACTIVE
 
 **Mock Data Required:**
 - Campaign ID
 - Brand ID
 - Product name
 - Target audience
-- Price (USDC)
+- Price (in USDC, USDT, $RAMM, or fiat)
 - Total supply
 - Bonding curve type
 - Redemption window (start/end)
+- Loyalty program configuration (earn rates, redemption options, transferability)
 
 **Validation:** `campaign_creation` test scenario validates flow.
 
@@ -303,15 +338,18 @@ A decentralized agent-based system deployable across multiple blockchain protoco
 3. VALET → SHOPI: Return campaign list
 4. SHOPI personalizes recommendations
 5. Shopper → SHOPI: Select campaign & buy
-6. SHOPI → MARKT: Swap quote/execute (USDC → PVT)
-7. SHOPI → PAYME: Authorize payment (escrow)
+6. SHOPI → MARKT: Swap quote/execute ($RAMM/USDC/USDT → PVT)
+7. SHOPI → PAYME: Authorize payment (escrow) - accepts fiat, USDC, USDT, or $RAMM
 8. SHOPI → FOLIO: Request Buy(PVT)
 9. FOLIO mints PVT to shopper wallet
-10. PAYME settles escrow
+10. FOLIO → LOYLT: Notify purchase event (for loyalty token accrual)
+11. LOYLT issues/updates loyalty token balance for shopper
+12. PAYME settles escrow
 
 **State Changes:**
 - FOLIO: IDLE → ACTIVE (PVT minted)
 - PAYME: IDLE → SETTLING (escrow locked)
+- LOYLT: IDLE → ACTIVE (loyalty tokens issued/updated)
 
 **Validation:** `purchase_flow` test scenario validates end-to-end flow.
 
@@ -326,11 +364,13 @@ A decentralized agent-based system deployable across multiple blockchain protoco
 2. FOLIO → RIDIM: Redemption request
 3. RIDIM → VALET: Validate redemption eligibility (timing, campaign state)
 4. VALET → RIDIM: Validation response
-5. RIDIM → PORTE: Mint DPP NFT
-6. PORTE mints DPP with product/sustainability metadata
-7. RIDIM → VALET: Request PromoCode
-8. RIDIM finalizes redemption state
-9. RIDIM → FOLIO: Confirmation
+5. (Optional) Shopper → LOYLT: Check loyalty token balance for partial payment
+6. (Optional) LOYLT → PAYME: Coordinate partial payment (loyalty tokens + $RAMM/USDC/USDT)
+7. RIDIM → PORTE: Mint DPP NFT
+8. PORTE mints DPP with product/sustainability metadata
+9. RIDIM → VALET: Request PromoCode
+10. RIDIM finalizes redemption state
+11. RIDIM → FOLIO: Confirmation
 
 **State Changes:**
 - PORTE: IDLE → COMPLETED (DPP minted)
@@ -342,7 +382,7 @@ A decentralized agent-based system deployable across multiple blockchain protoco
 
 ### FR8: Business Logic Calculations
 
-**Requirement:** System must correctly calculate pricing, rewards, yield, and ROI.
+**Requirement:** System must correctly calculate pricing, rewards, yield, ROI, and loyalty token operations.
 
 #### FR8.1: Bonding Curve Pricing
 
@@ -397,6 +437,25 @@ A decentralized agent-based system deployable across multiple blockchain protoco
 - Projected sellout days: `remaining_supply / daily_sales_rate`
 
 **Validation:** 2 business logic tests validate ROI calculations.
+
+#### FR8.5: Loyalty Token Calculations
+
+**Loyalty Token Earnings:**
+- Base earnings: `earnings = purchase_amount * earn_rate`
+- Promotion bonus: `bonus = base_earnings * promotion_bonus_multiplier`
+- Total earnings: `total = base_earnings + bonus_earnings`
+
+**Partial Payment Calculation:**
+- Loyalty token redemption rate: `loyalty_token_value = loyalty_tokens * redemption_rate` (in $RAMM/USDC/USDT equivalent)
+- Maximum loyalty usage: `max_loyalty_value = total_amount * max_usage_percentage`
+- Loyalty used: `min(loyalty_token_value, max_loyalty_value)`
+- Payment currency required: `total_amount - loyalty_token_value` (can be $RAMM, USDC, USDT, or fiat)
+
+**Balance Updates:**
+- New balance: `current_balance + earnings - redemptions`
+- Balance cannot go negative (enforced at calculation level)
+
+**Validation:** 3 business logic tests validate loyalty calculations.
 
 ---
 
@@ -994,7 +1053,7 @@ This contract ensures protocol-agnostic core logic can work with any protocol im
 ### Protocol Deployment Readiness
 
 **Ready for Any Protocol Deployment (Protocol-Agnostic):**
-- ✅ Agent architecture defined (14 agents with roles and responsibilities)
+- ✅ Agent architecture defined (15 agents with roles and responsibilities)
 - ✅ A2A communication patterns validated (NANDA protocol - protocol-agnostic)
 - ✅ State machine logic tested (16 test scenarios - protocol-agnostic)
 - ✅ Business logic validated (11 business logic tests - protocol-agnostic)
@@ -1036,10 +1095,11 @@ This contract ensures protocol-agnostic core logic can work with any protocol im
 | **RIDIM Canister** | RIDIM | Application | PVT redemption orchestration |
 | **PROMO Canister** | PROMO | Application | Influencer & affiliate management |
 | **FOLIO Canister** | FOLIO | Application | PVT wallet management |
-| **PAYME Canister** | PAYME | Finance | Escrow handling, payment execution |
-| **DEFIME Canister** | DEFIME | Finance | Yield management, DeFi integration |
+| **PAYME Canister** | PAYME | Finance | Escrow handling, payment execution (multi-currency support) |
+| **DEFIME Canister** | DEFIME | Finance | Yield management, DeFi integration (multi-asset yield) |
+| **LOYLT Canister** | LOYLT | Application | Loyalty & Rewards Manager |
 | **ICP_ID Canister** | ICP_ID | Identity | Internet Identity integration |
-| **PAYOUT Canister** | PAYOUT | Finance | Fund withdrawal (under consideration) |
+| **PAYOUT Canister** | PAYOUT | Finance | Fund withdrawal (multi-currency disbursement) |
 
 **Subnet Distribution:**
 - **Brand Services Subnet**: VALET (with PORTE), DASHB (with DASHC), PROMO canisters
@@ -1108,7 +1168,8 @@ Response: Certified data returned to shopi-canister
 - **Storage**: Stable memory for persistent state
 - **Authentication**: Internet Identity via ICP_ID canister
 - **Communication**: Inter-canister calls (A2A protocol)
-- **Multi-chain**: Chain Fusion for token operations across blockchains
+- **Multi-chain**: Chain Fusion for token operations across blockchains (including $RAMM from Base)
+- **Supported Currencies**: Via Chain Fusion - $RAMM (Base), USDC, USDT, and other bridged tokens
 - **AI Integration**: Self-writing apps capability for VALET agent
 
 #### Key Advantages
@@ -1145,14 +1206,15 @@ Response: Certified data returned to shopi-canister
 | **ValetContract** | VALET, PORTE | Main + Library | VALET (main contract) + PORTE (library/module) |
 | **DashboardContract** | DASHB, DASHC | Main + Library | DASHB (main contract) + DASHC (library/module) |
 | **ShopiContract** | SHOPI | Standalone | Shopping journey, personalization |
-| **MarktContract** | MARKT | Standalone | Core AMM, swaps (USDC ↔ PVT) |
+| **MarktContract** | MARKT | Standalone | Core AMM, swaps ($RAMM/USDC/USDT ↔ PVT) |
 | **RidimContract** | RIDIM | Standalone | PVT redemption orchestration |
 | **PromoContract** | PROMO | Standalone | Influencer & affiliate management |
 | **FolioContract** | FOLIO | Standalone | PVT wallet management (ERC-721/1155) |
-| **PaymeContract** | PAYME | Standalone | Escrow handling, payment execution |
-| **DefimeContract** | DEFIME | Standalone | Yield management, DeFi integration |
+| **PaymeContract** | PAYME | Standalone | Escrow handling, payment execution (fiat/USDC/USDT/$RAMM) |
+| **DefimeContract** | DEFIME | Standalone | Yield management, DeFi integration (yield in $RAMM/assets) |
+| **LoyltContract** | LOYLT | Standalone | Loyalty & Rewards Manager |
 | **IdentityContract** | ICP_ID | Standalone | Identity verification (wallet-based) |
-| **PayoutContract** | PAYOUT | Standalone | Fund withdrawal (under consideration) |
+| **PayoutContract** | PAYOUT | Standalone | Fund withdrawal (fiat/USDC/USDT/$RAMM disbursement) |
 
 **Gas Optimization:**
 - Sub-agents (PORTE, DASHC) implemented as libraries to reduce gas costs
@@ -1223,7 +1285,11 @@ Event: CampaignQuery event emitted (optional)
 - **Storage**: Contract storage (gas-optimized)
 - **Authentication**: Wallet signatures (EIP-712) via IdentityContract
 - **Communication**: Contract function calls (A2A protocol)
-- **Token Standards**: ERC-20 for PVTs, ERC-721/1155 for DPP NFTs
+- **Token Standards**: 
+  - ERC-20 for $RAMM (native token), USDC, USDT, and PVTs
+  - ERC-721/1155 for DPP NFTs
+- **Native Token**: $RAMM deployed on Base
+- **Supported Currencies**: $RAMM, USDC (Base native), USDT
 - **Bridge Integration**: Base's native bridge for multi-chain operations
 
 #### Key Advantages
@@ -1294,7 +1360,10 @@ Event: CampaignQuery event emitted (optional)
 - **Storage**: Contract storage (gas-optimized)
 - **Authentication**: Wallet signatures (EIP-712) via IdentityContract
 - **Communication**: Contract function calls (A2A protocol)
-- **Token Standards**: ERC-20 for PVTs, ERC-721/1155 for DPP NFTs
+- **Token Standards**: 
+  - ERC-20 for $RAMM (if deployed), USDC, USDT, and PVTs
+  - ERC-721/1155 for DPP NFTs
+- **Supported Currencies**: $RAMM (if deployed), USDC, USDT
 - **Bridge Integration**: Optimism's native bridge for cross-chain operations
 
 #### Key Advantages
@@ -1366,7 +1435,10 @@ Event: CampaignQuery event emitted (optional)
 - **Storage**: L2-specific storage mechanisms
 - **Authentication**: L2-specific authentication (wallet-based for EVM L2s)
 - **Communication**: L2-specific communication mechanisms
-- **Token Standards**: ERC-20 for PVTs, ERC-721/1155 for DPP NFTs (EVM L2s)
+- **Token Standards**: 
+  - ERC-20 for $RAMM (if deployed), USDC, USDT, and PVTs (EVM L2s)
+  - ERC-721/1155 for DPP NFTs (EVM L2s)
+- **Supported Currencies**: $RAMM (if deployed), USDC, USDT, and L2-specific tokens
 - **Bridge Integration**: L2-specific bridge mechanisms
 
 #### Key Advantages
@@ -1443,6 +1515,7 @@ Event: CampaignQuery event emitted (optional)
 - DASHB (main agent, shares deployment unit with DASHC sub-agent)
 - DASHC (sub-agent, shares DASHB deployment unit)
 - PROMO (own deployment unit)
+- LOYLT (own deployment unit, Loyalty & Rewards Manager)
 
 **Shopper-Facing:**
 - SHOPI (own deployment unit)
@@ -1475,6 +1548,7 @@ Event: CampaignQuery event emitted (optional)
 | RIDIM | Redemption state | Redemption validation |
 | PORTE | DPP NFT mint | DPP template queries |
 | MARKT | Swap execution | Swap quotes |
+| LOYLT | Loyalty token issuance/redemption | Loyalty balance queries |
 | ICP_ID | None | Principal verification |
 
 ---

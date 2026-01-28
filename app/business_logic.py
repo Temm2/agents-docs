@@ -259,13 +259,100 @@ class ROICalculator:
         }
 
 
+class LoyaltyCalculator:
+    """Calculate loyalty token earnings, balances, and redemption values."""
+
+    @staticmethod
+    def calculate_loyalty_earnings(
+        purchase_amount: float,
+        earn_rate: float,  # Percentage of purchase amount (e.g., 0.05 = 5%)
+        promotion_bonus: float = 0.0,  # Additional bonus multiplier
+    ) -> dict:
+        """
+        Calculate loyalty tokens earned from a purchase.
+
+        Returns: {
+            'base_earnings': float,
+            'bonus_earnings': float,
+            'total_earnings': float
+        }
+        """
+        base_earnings = purchase_amount * earn_rate
+        bonus_earnings = base_earnings * promotion_bonus
+        total_earnings = base_earnings + bonus_earnings
+
+        return {
+            "base_earnings": base_earnings,
+            "bonus_earnings": bonus_earnings,
+            "total_earnings": total_earnings,
+            "purchase_amount": purchase_amount,
+            "earn_rate": earn_rate,
+        }
+
+    @staticmethod
+    def calculate_partial_payment(
+        total_amount: float,
+        loyalty_balance: float,
+        loyalty_redemption_rate: float = 1.0,  # 1.0 = 1:1 with USDC, 0.5 = 2 loyalty tokens = 1 USDC
+        max_loyalty_usage: float = 0.5,  # Max 50% of payment can be loyalty tokens
+    ) -> dict:
+        """
+        Calculate partial payment using loyalty tokens + USDC.
+
+        Returns: {
+            'loyalty_used': float,
+            'usdc_required': float,
+            'loyalty_equivalent_usdc': float
+        }
+        """
+        max_loyalty_usdc_value = total_amount * max_loyalty_usage
+        loyalty_equivalent_usdc = loyalty_balance * loyalty_redemption_rate
+        loyalty_used_usdc = min(loyalty_equivalent_usdc, max_loyalty_usdc_value)
+        loyalty_used_tokens = loyalty_used_usdc / loyalty_redemption_rate if loyalty_redemption_rate > 0 else 0.0
+        usdc_required = total_amount - loyalty_used_usdc
+
+        return {
+            "loyalty_used": loyalty_used_tokens,
+            "loyalty_used_usdc_value": loyalty_used_usdc,
+            "usdc_required": usdc_required,
+            "total_amount": total_amount,
+            "loyalty_balance": loyalty_balance,
+            "loyalty_redemption_rate": loyalty_redemption_rate,
+        }
+
+    @staticmethod
+    def calculate_loyalty_balance_update(
+        current_balance: float,
+        earnings: float,
+        redemptions: float = 0.0,
+    ) -> dict:
+        """
+        Calculate updated loyalty token balance.
+
+        Returns: {
+            'previous_balance': float,
+            'earnings': float,
+            'redemptions': float,
+            'new_balance': float
+        }
+        """
+        new_balance = current_balance + earnings - redemptions
+
+        return {
+            "previous_balance": current_balance,
+            "earnings": earnings,
+            "redemptions": redemptions,
+            "new_balance": max(0.0, new_balance),  # Balance cannot go negative
+        }
+
+
 # Test scenarios for business logic
 class BusinessLogicTest(BaseModel):
     """Test case for business logic validation."""
 
     name: str
     description: str
-    test_type: str  # "bonding_curve", "reward", "yield", "roi"
+    test_type: str  # "bonding_curve", "reward", "yield", "roi", "loyalty"
     input_data: dict
     expected_output: dict
     tolerance: float = 0.01  # Allowed difference for floating point
@@ -404,6 +491,52 @@ def get_business_logic_tests() -> List[BusinessLogicTest]:
             },
             tolerance=0.01,
         ),
+        # Loyalty Tests
+        BusinessLogicTest(
+            name="loyalty_earnings_5_percent",
+            description="Loyalty token earnings at 5% earn rate",
+            test_type="loyalty",
+            input_data={
+                "purchase_amount": 100.0,
+                "earn_rate": 0.05,
+                "promotion_bonus": 0.0,
+            },
+            expected_output={
+                "base_earnings": 5.0,  # 100 * 0.05 = 5.0
+                "total_earnings": 5.0,
+            },
+            tolerance=0.01,
+        ),
+        BusinessLogicTest(
+            name="loyalty_partial_payment",
+            description="Partial payment using loyalty tokens (50% max)",
+            test_type="loyalty",
+            input_data={
+                "total_amount": 100.0,
+                "loyalty_balance": 200.0,
+                "loyalty_redemption_rate": 0.5,  # 2 tokens = 1 USDC
+                "max_loyalty_usage": 0.5,
+            },
+            expected_output={
+                "loyalty_used": 100.0,  # 50 USDC value / 0.5 rate = 100 tokens
+                "usdc_required": 50.0,  # 100 - 50 = 50
+            },
+            tolerance=0.01,
+        ),
+        BusinessLogicTest(
+            name="loyalty_balance_update",
+            description="Update loyalty balance with earnings and redemptions",
+            test_type="loyalty",
+            input_data={
+                "current_balance": 100.0,
+                "earnings": 25.0,
+                "redemptions": 10.0,
+            },
+            expected_output={
+                "new_balance": 115.0,  # 100 + 25 - 10 = 115
+            },
+            tolerance=0.01,
+        ),
     ]
 
 
@@ -473,6 +606,30 @@ def run_business_logic_test(test: BusinessLogicTest) -> dict:
                     campaign_duration_days=test.input_data["campaign_duration_days"],
                 )
                 result["actual"] = velocity
+
+        elif test.test_type == "loyalty":
+            if "purchase_amount" in test.input_data:
+                earnings = LoyaltyCalculator.calculate_loyalty_earnings(
+                    purchase_amount=test.input_data["purchase_amount"],
+                    earn_rate=test.input_data["earn_rate"],
+                    promotion_bonus=test.input_data.get("promotion_bonus", 0.0),
+                )
+                result["actual"] = earnings
+            elif "total_amount" in test.input_data:
+                payment = LoyaltyCalculator.calculate_partial_payment(
+                    total_amount=test.input_data["total_amount"],
+                    loyalty_balance=test.input_data["loyalty_balance"],
+                    loyalty_redemption_rate=test.input_data.get("loyalty_redemption_rate", 1.0),
+                    max_loyalty_usage=test.input_data.get("max_loyalty_usage", 0.5),
+                )
+                result["actual"] = payment
+            elif "current_balance" in test.input_data:
+                balance = LoyaltyCalculator.calculate_loyalty_balance_update(
+                    current_balance=test.input_data["current_balance"],
+                    earnings=test.input_data["earnings"],
+                    redemptions=test.input_data.get("redemptions", 0.0),
+                )
+                result["actual"] = balance
 
         # Validate results
         all_passed = True
