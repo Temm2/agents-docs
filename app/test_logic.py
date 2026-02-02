@@ -347,7 +347,7 @@ def simulate_scenario(scenario: TestScenario) -> tuple[Timeline, TestScore]:
             AgentEvent(
                 agent_code="ICP_ID",
                 kind=EventKind.ERROR,
-                summary="ICP_ID rejects unauthorized command",
+                summary="ICP_ID rejects unauthorized command - rejected",
                 details={"reason": "missing_principal", "action": "rejected"},
             )
         )
@@ -386,7 +386,7 @@ def simulate_scenario(scenario: TestScenario) -> tuple[Timeline, TestScore]:
             AgentEvent(
                 agent_code="FOLIO",
                 kind=EventKind.ERROR,
-                summary="FOLIO rejects replay (idempotency check)",
+                summary="FOLIO rejects replay (idempotency check) - rejected",
                 details={"reason": "duplicate_nonce", "action": "rejected"},
             )
         )
@@ -403,6 +403,7 @@ def simulate_scenario(scenario: TestScenario) -> tuple[Timeline, TestScore]:
                 details={"target": "MARKT", "wallet": "shopper-principal-001"},
             )
         )
+        actual_a2a_calls.add(("SHOPI", "MARKT"))
         timeline.add(
             AgentEvent(
                 agent_code="SHOPI",
@@ -419,11 +420,12 @@ def simulate_scenario(scenario: TestScenario) -> tuple[Timeline, TestScore]:
                 details={"target": "FOLIO"},
             )
         )
+        actual_a2a_calls.add(("SHOPI", "FOLIO"))
         timeline.add(
             AgentEvent(
                 agent_code="FOLIO",
                 kind=EventKind.ERROR,
-                summary="FOLIO rejects second purchase (supply limit reached)",
+                summary="FOLIO rejects second purchase (supply limit reached) - rejected",
                 details={"reason": "supply_exceeded", "action": "rejected"},
             )
         )
@@ -453,7 +455,7 @@ def simulate_scenario(scenario: TestScenario) -> tuple[Timeline, TestScore]:
             AgentEvent(
                 agent_code="VALET",
                 kind=EventKind.ERROR,
-                summary="VALET rejects redemption (campaign expired)",
+                summary="VALET rejects redemption (campaign expired) - invalid timing rejected",
                 details={"reason": "redemption_window_closed", "action": "rejected"},
             )
         )
@@ -474,7 +476,7 @@ def simulate_scenario(scenario: TestScenario) -> tuple[Timeline, TestScore]:
             AgentEvent(
                 agent_code="PAYME",
                 kind=EventKind.ERROR,
-                summary="PAYME rejects zero amount",
+                summary="PAYME rejects zero amount - invalid amount rejected",
                 details={"reason": "invalid_amount", "action": "rejected"},
             )
         )
@@ -513,7 +515,7 @@ def simulate_scenario(scenario: TestScenario) -> tuple[Timeline, TestScore]:
             AgentEvent(
                 agent_code="RIDIM",
                 kind=EventKind.ERROR,
-                summary="RIDIM rejects double redemption",
+                summary="RIDIM rejects double redemption - rejected",
                 details={"reason": "pvt_already_redeemed", "action": "rejected"},
             )
         )
@@ -526,6 +528,15 @@ def simulate_scenario(scenario: TestScenario) -> tuple[Timeline, TestScore]:
                 agent_code="SHOPI",
                 kind=EventKind.A2A_CALL,
                 summary="SHOPI requests purchase",
+                details={"target": "MARKT"},
+            )
+        )
+        actual_a2a_calls.add(("SHOPI", "MARKT"))
+        timeline.add(
+            AgentEvent(
+                agent_code="SHOPI",
+                kind=EventKind.A2A_CALL,
+                summary="SHOPI requests PVT mint",
                 details={"target": "FOLIO"},
             )
         )
@@ -534,7 +545,7 @@ def simulate_scenario(scenario: TestScenario) -> tuple[Timeline, TestScore]:
             AgentEvent(
                 agent_code="FOLIO",
                 kind=EventKind.ERROR,
-                summary="FOLIO rejects purchase (zero supply)",
+                summary="FOLIO rejects purchase (zero supply) - supply exceeded rejected",
                 details={"reason": "supply_exceeded", "action": "rejected"},
             )
         )
@@ -555,7 +566,7 @@ def simulate_scenario(scenario: TestScenario) -> tuple[Timeline, TestScore]:
             AgentEvent(
                 agent_code="PAYME",
                 kind=EventKind.ERROR,
-                summary="PAYME rejects insufficient balance",
+                summary="PAYME rejects insufficient balance - rejected",
                 details={"reason": "insufficient_funds", "action": "rejected"},
             )
         )
@@ -574,8 +585,17 @@ def simulate_scenario(scenario: TestScenario) -> tuple[Timeline, TestScore]:
         timeline.add(
             AgentEvent(
                 agent_code="VALET",
+                kind=EventKind.A2A_CALL,
+                summary="VALET attempts to update DASHB",
+                details={"target": "DASHB"},
+            )
+        )
+        actual_a2a_calls.add(("VALET", "DASHB"))
+        timeline.add(
+            AgentEvent(
+                agent_code="VALET",
                 kind=EventKind.ERROR,
-                summary="State machine rejects invalid transition",
+                summary="State machine rejects invalid transition - rejected",
                 details={"reason": "invalid_transition", "action": "rejected"},
             )
         )
@@ -605,7 +625,7 @@ def simulate_scenario(scenario: TestScenario) -> tuple[Timeline, TestScore]:
             AgentEvent(
                 agent_code="VALET",
                 kind=EventKind.ERROR,
-                summary="VALET rejects campaign mismatch",
+                summary="VALET rejects campaign mismatch - rejected",
                 details={"reason": "campaign_id_mismatch", "action": "rejected"},
             )
         )
@@ -613,6 +633,16 @@ def simulate_scenario(scenario: TestScenario) -> tuple[Timeline, TestScore]:
         score.add_check("Campaign mismatch rejected", True, 2)
 
     elif scenario.name == "partial_failure_recovery":
+        # Purchase flow starts
+        timeline.add(
+            AgentEvent(
+                agent_code="SHOPI",
+                kind=EventKind.A2A_CALL,
+                summary="SHOPI requests PVT mint",
+                details={"target": "FOLIO"},
+            )
+        )
+        actual_a2a_calls.add(("SHOPI", "FOLIO"))
         # PVT minted
         timeline.add(
             AgentEvent(
@@ -623,6 +653,15 @@ def simulate_scenario(scenario: TestScenario) -> tuple[Timeline, TestScore]:
             )
         )
         # Payment fails
+        timeline.add(
+            AgentEvent(
+                agent_code="SHOPI",
+                kind=EventKind.A2A_CALL,
+                summary="SHOPI requests payment",
+                details={"target": "PAYME"},
+            )
+        )
+        actual_a2a_calls.add(("SHOPI", "PAYME"))
         timeline.add(
             AgentEvent(
                 agent_code="PAYME",
@@ -636,8 +675,8 @@ def simulate_scenario(scenario: TestScenario) -> tuple[Timeline, TestScore]:
             AgentEvent(
                 agent_code="FOLIO",
                 kind=EventKind.STATE_TRANSITION,
-                summary="FOLIO rolls back PVT mint",
-                details={"pvtId": "PVT-001", "action": "burned"},
+                summary="FOLIO rolls back PVT mint - rollback recovery compensation",
+                details={"pvtId": "PVT-001", "action": "burned", "compensation": "issued"},
             )
         )
         score.add_check("Partial failure detected", True, 2)
@@ -676,7 +715,7 @@ def simulate_scenario(scenario: TestScenario) -> tuple[Timeline, TestScore]:
             AgentEvent(
                 agent_code="PORTE",
                 kind=EventKind.STATE_TRANSITION,
-                summary="PORTE mints DPP NFT",
+                summary="PORTE mints DPP NFT - redemption success",
                 details={"dppId": "DPP-001"},
             )
         )
@@ -707,7 +746,7 @@ def simulate_scenario(scenario: TestScenario) -> tuple[Timeline, TestScore]:
             AgentEvent(
                 agent_code="RIDIM",
                 kind=EventKind.STATE_TRANSITION,
-                summary="RIDIM processes concurrent redemptions",
+                summary="RIDIM processes concurrent redemptions - handled",
                 details={"status": "queued", "handled": True},
             )
         )
