@@ -381,6 +381,54 @@ def ramm_edges() -> List[A2AEdge]:
         ("LOYLT", "MARKT"): ("request", "loyalty.swap.enable", "{brandId, loyaltyTokenId, swapRules}"),
         ("LOYLT", "PAYME"): ("command", "loyalty.partial_payment", "{wallet, campaignId, loyaltyTokenAmount, usdcAmount}"),
         ("LOYLT", "DASHB"): ("event", "loyalty.metrics.updated", "{brandId, campaignId, metrics, state}"),
+        # PORTE edges
+        ("PORTE", "VALET"): ("notify", "dpp.minted", "{dppId, campaignId, wallet, metadata}"),
+        ("PORTE", "PROMO"): ("event", "dpp.mint.completed", "{dppId, campaignId, wallet}"),
+        ("PORTE", "RIDIM"): ("respond", "dpp.mint.response", "{dppId, status, metadata}"),
+        # DASHB edges
+        ("DASHB", "VALET"): ("query", "campaign.analytics.request", "{campaignId, metricsType}"),
+        ("DASHB", "MARKT"): ("query", "market.analytics.request", "{campaignId, timeRange}"),
+        ("DASHB", "PROMO"): ("query", "promo.analytics.request", "{campaignId, influencerId}"),
+        # RIDIM edges
+        ("RIDIM", "FOLIO"): ("notify", "redemption.completed", "{pvtId, campaignId, wallet, status}"),
+        # MARKT edges
+        ("MARKT", "FOLIO"): ("command", "pvt.transfer", "{from, to, amount, campaignId}"),
+        # SHOPI edges
+        ("SHOPI", "PROMO"): ("query", "promo.recommendations", "{wallet, campaignId, preferences}"),
+        ("SHOPI", "MIRO"): ("request", "visual.feedback.request", "{productId, style, preferences}"),
+        # DASHC edges
+        ("DASHC", "VALET"): ("event", "analytics.shopper.aggregated", "{campaignId, metrics, timeRange}"),
+        ("DASHC", "PAYME"): ("query", "analytics.payment.stats", "{campaignId, wallet}"),
+        ("DASHC", "PROMO"): ("event", "analytics.promo.engagement", "{campaignId, influencerId, metrics}"),
+        ("DASHC", "FOLIO"): ("query", "analytics.portfolio.stats", "{wallet, campaignId}"),
+        # FOLIO edges
+        ("FOLIO", "PAYME"): ("notify", "pvt.minted", "{pvtId, campaignId, wallet, amount}"),
+        ("FOLIO", "PROMO"): ("event", "pvt.transfer.event", "{pvtId, from, to, campaignId}"),
+        # PROMO edges
+        ("PROMO", "VALET"): ("notify", "promo.campaign.updated", "{campaignId, influencerId, status}"),
+        ("PROMO", "PAYME"): ("command", "promo.reward.distribute", "{wallet, campaignId, rewardAmount}"),
+        ("PROMO", "SHOPI"): ("event", "promo.recommendation.updated", "{campaignId, influencerId, score}"),
+        # PAYME edges
+        ("PAYME", "FOLIO"): ("notify", "payment.settled", "{transactionId, campaignId, amount}"),
+        ("PAYME", "PROMO"): ("notify", "reward.paid", "{wallet, campaignId, amount, currency}"),
+        ("PAYME", "SHOPI"): ("respond", "payment.authorization.response", "{transactionId, status, amount}"),
+        ("PAYME", "VALET"): ("event", "payment.campaign.funded", "{campaignId, amount, currency}"),
+        # DEFIME edges
+        ("DEFIME", "PAYME"): ("notify", "yield.generated", "{campaignId, amount, yieldAmount, strategy}"),
+        ("DEFIME", "FOLIO"): ("notify", "yield.distributed", "{wallet, amount, yieldAmount}"),
+        # ICP_ID edges (all are auth responses)
+        ("ICP_ID", "VALET"): ("respond", "auth.verify_principal.response", "{principal, verified, role}"),
+        ("ICP_ID", "SHOPI"): ("respond", "auth.verify_principal.response", "{principal, verified, role}"),
+        ("ICP_ID", "FOLIO"): ("respond", "auth.verify_principal.response", "{principal, verified, role}"),
+        ("ICP_ID", "PAYME"): ("respond", "auth.verify_principal.response", "{principal, verified, role}"),
+        ("ICP_ID", "PROMO"): ("respond", "auth.verify_principal.response", "{principal, verified, role}"),
+        ("ICP_ID", "MARKT"): ("respond", "auth.verify_principal.response", "{principal, verified, role}"),
+        ("ICP_ID", "RIDIM"): ("respond", "auth.verify_principal.response", "{principal, verified, role}"),
+        # PAYOUT edges
+        ("PAYOUT", "DASHB"): ("event", "payout.status.updated", "{campaignId, status, amount}"),
+        ("PAYOUT", "VALET"): ("notify", "payout.completed", "{campaignId, amount, currency}"),
+        # MIRO edges
+        ("MIRO", "SHOPI"): ("respond", "visual.feedback.response", "{productId, mockup, recommendations}"),
     }
 
     for agent in ramm_agents():
